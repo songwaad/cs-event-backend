@@ -1,0 +1,55 @@
+basePath: /
+definitions:
+  entities.Instructor:
+    properties:
+      created_at:
+        type: string
+      deleted_at:
+        type: string
+      description:
+        type: string
+      firstname:
+        type: string
+      id:
+        type: integer
+      lastname:
+        type: string
+      updated_at:
+        type: string
+    type: object
+host: localhost:8080
+info:
+  contact: {}
+  description: This is a sample server for a ComSci Event API.
+  title: ComSci Event API
+  version: "1.0"
+paths:
+  /Instructors:
+    get:
+      consumes:
+      - application/json
+      description: |-
+        Get details of all Instructors
+        Instructor struct with Gorm Model and soft delete
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/entities.Instructor'
+            type: array
+      security:
+      - ApiKeyAuth: []
+      summary: Get all Instructors
+      tags:
+      - Instructors
+schemes:
+- http
+securityDefinitions:
+  ApiKeyAuth:
+    in: header
+    name: Authorization
+    type: apiKey
+swagger: "2.0"
