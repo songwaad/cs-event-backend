@@ -49,6 +49,17 @@ func (h *HttpInstructorHandle) GetInstructorByID(c *fiber.Ctx) error {
 	return c.JSON(instructor)
 }
 
+// Handler functions
+// GetAllInstructors godoc
+// @Summary Get all Instructors
+// @Description Get details of all Instructors
+// @Tags Instructors
+// @Accept  json
+// @Produce  json
+// @Security ApiKeyAuth
+// @Success 200 {array} entities.Instructor
+// @Description Instructor struct with Gorm Model and soft delete
+// @Router /Instructors [get]
 func (h *HttpInstructorHandle) GetAllInstructors(c *fiber.Ctx) error {
 	instructors, err := h.instructorUseCase.GetAllInstructors()
 	if err != nil {
