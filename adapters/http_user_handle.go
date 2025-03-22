@@ -10,7 +10,11 @@ import (
 )
 
 type UserHandler struct {
-	UserUseCase *usecases.UserUseCase
+	UserUseCase usecases.UserUseCase
+}
+
+func NewUserHandler(userUseCase usecases.UserUseCase) *UserHandler {
+	return &UserHandler{UserUseCase: userUseCase}
 }
 
 func (h *UserHandler) Register(c *fiber.Ctx) error {
@@ -21,11 +25,13 @@ func (h *UserHandler) Register(c *fiber.Ctx) error {
 		})
 	}
 
-	if err := h.UserUseCase.Register(user); err != nil {
+	if err := h.UserUseCase.Register(&user); err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
 			"message": err.Error(),
 		})
 	}
+
+	user.Password = ""
 
 	return c.Status(fiber.StatusCreated).JSON(fiber.Map{
 		"message": "User created successfully",
@@ -72,6 +78,61 @@ func (h *UserHandler) Login(c *fiber.Ctx, jwtSecretKey string) error {
 
 	return c.Status(fiber.StatusOK).JSON(fiber.Map{
 		"message": "login success",
+		"token":   t,
+	})
+}
+
+func (h *UserHandler) GetUserByID(c *fiber.Ctx) error {
+	userID := c.Params("id")
+
+	user, err := h.UserUseCase.GetUserByID(userID)
+	if err != nil {
+		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{
+			"message": err.Error(),
+		})
+	}
+
+	user.Password = ""
+	return c.Status(fiber.StatusOK).JSON(user)
+}
+
+func (h *UserHandler) GetAllUsers(c *fiber.Ctx) error {
+	users, err := h.UserUseCase.GetAllUsers()
+	if err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"message": err.Error(),
+		})
+	}
+
+	for i := range users {
+		users[i].Password = ""
+	}
+
+	return c.Status(fiber.StatusOK).JSON(users)
+}
+
+func (h *UserHandler) UpdateUser(c *fiber.Ctx) error {
+	userId := c.Params("id")
+
+	var user entities.User
+	if err := c.BodyParser(&user); err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"message": err.Error(),
+		})
+	}
+
+	user.ID = userId
+
+	if err := h.UserUseCase.UpdateUser(&user); err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"message": err.Error(),
+		})
+	}
+
+	user.Password = ""
+	return c.Status(fiber.StatusOK).JSON(fiber.Map{
+		"message": "User updated successfully",
+		"user":    user,
 	})
 }
 
@@ -86,5 +147,18 @@ func (h *UserHandler) DeleteUser(c *fiber.Ctx) error {
 
 	return c.Status(fiber.StatusOK).JSON(fiber.Map{
 		"message": "User deleted successfully",
+	})
+}
+
+func (h *UserHandler) Logout(c *fiber.Ctx) error {
+	c.Cookie(&fiber.Cookie{
+		Name:     "jwt",
+		Value:    "",
+		Expires:  time.Now().Add(-time.Hour),
+		HTTPOnly: false,
+	})
+
+	return c.Status(fiber.StatusOK).JSON(fiber.Map{
+		"message": "logout success",
 	})
 }
