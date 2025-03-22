@@ -99,5 +99,8 @@ func (h *HttpInstructorHandle) DeleteInstructor(c *fiber.Ctx) error {
 		})
 	}
 
-	return c.SendStatus(fiber.StatusNoContent)
+	c.Status(fiber.StatusNoContent)
+	return c.JSON(fiber.Map{
+		"message": "Instructor deleted successfully",
+	})
 }
