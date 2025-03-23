@@ -46,7 +46,7 @@ func (h *HttpInstructorHandle) GetInstructorByID(c *fiber.Ctx) error {
 		})
 	}
 
-	return c.JSON(instructor)
+	return c.Status(fiber.StatusOK).JSON(instructor)
 }
 
 // Handler functions
