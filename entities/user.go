@@ -24,8 +24,10 @@ type User struct {
 	Password     string
 	FirstName    string
 	Lastname     string
-	UserRoleID   UserRole
+	UserRoleID   uint
 	UserRole     UserRole
+	UserStatusID uint
+	UserStatus   UserStatus
 	Status       string
-	EventDetails []EventDetails `gorm:"many2many:event_reponsible;"`
+	// EventDetails []EventDetails `gorm:"many2many:event_reponsible;"`
 }
