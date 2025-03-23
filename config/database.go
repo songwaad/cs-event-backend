@@ -48,8 +48,8 @@ func ConnectDatabase() *gorm.DB {
 		newLogger := logger.New(
 			log.New(os.Stdout, "\r\n", log.LstdFlags), // io writer
 			logger.Config{
-				SlowThreshold: time.Second, // Slow SQL threshold
-				LogLevel:      logger.Info, // Log level: Silent, Error, Warn, Info
+				SlowThreshold: time.Second,  // Slow SQL threshold
+				LogLevel:      logger.Error, // Log level: Silent, Error, Warn, Info
 				Colorful:      true,
 			},
 		)
@@ -63,7 +63,6 @@ func ConnectDatabase() *gorm.DB {
 		}
 
 		db = dbInstance
-		fmt.Println("Database connected Successfully!")
 	})
 
 	return db
