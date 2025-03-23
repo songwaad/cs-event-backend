@@ -16,14 +16,16 @@ const (
 )
 
 type User struct {
-	ID        string `gorm:"primaryKey"`
-	CreatedAt time.Time
-	UpdatedAt time.Time
-	DeleteAt  gorm.DeletedAt `gorm:"index"`
-	Email     string         `gorm:"unique"`
-	Password  string
-	FirstName string
-	Lastname  string
-	Role      string
-	Status    string
+	ID           string `gorm:"primaryKey"`
+	CreatedAt    time.Time
+	UpdatedAt    time.Time
+	DeleteAt     gorm.DeletedAt `gorm:"index"`
+	Email        string         `gorm:"unique"`
+	Password     string
+	FirstName    string
+	Lastname     string
+	UserRoleID   UserRole
+	UserRole     UserRole
+	Status       string
+	EventDetails []EventDetails `gorm:"many2many:event_reponsible;"`
 }
