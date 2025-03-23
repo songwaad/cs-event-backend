@@ -25,6 +25,14 @@ func (h *UserHandler) Register(c *fiber.Ctx) error {
 		})
 	}
 
+	if user.Email == "" || user.Password == "" {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"message": "email and password are required",
+		})
+	}
+
+	user.UserStatus.ID = 1
+
 	if err := h.UserUseCase.Register(&user); err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
 			"message": err.Error(),
@@ -61,7 +69,7 @@ func (h *UserHandler) Login(c *fiber.Ctx, jwtSecretKey string) error {
 	token := jwt.New(jwt.SigningMethodHS256)
 	claims := token.Claims.(jwt.MapClaims)
 	claims["user_id"] = user.ID
-	claims["role"] = user.Role
+	claims["role"] = user.UserRole.Role
 	claims["exp"] = time.Now().Add(time.Hour * 72).Unix()
 
 	t, err := token.SignedString([]byte(jwtSecretKey))

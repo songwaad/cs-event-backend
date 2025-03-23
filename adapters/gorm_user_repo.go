@@ -20,7 +20,7 @@ func (r *GormUserRepo) CreateUser(user *entities.User) error {
 
 func (r *GormUserRepo) GetUserByEmail(email string) (*entities.User, error) {
 	var user entities.User
-	err := r.DB.Where("email = ?", email).First(&user).Error
+	err := r.DB.Preload("UserRole").Preload("UserStatus").Where("email = ?", email).First(&user).Error
 	if err != nil {
 		return nil, err
 	}
@@ -29,7 +29,7 @@ func (r *GormUserRepo) GetUserByEmail(email string) (*entities.User, error) {
 
 func (r *GormUserRepo) GetUserByID(userID string) (*entities.User, error) {
 	var user entities.User
-	err := r.DB.Where("id = ?", userID).First(&user).Error
+	err := r.DB.Preload("UserRole").Preload("UserStatus").Where("id = ?", userID).First(&user).Error
 	if err != nil {
 		return nil, err
 	}
@@ -38,7 +38,7 @@ func (r *GormUserRepo) GetUserByID(userID string) (*entities.User, error) {
 
 func (r *GormUserRepo) GetAllUsers() ([]entities.User, error) {
 	var users []entities.User
-	err := r.DB.Find(&users).Error
+	err := r.DB.Preload("UserRole").Preload("UserStatus").Find(&users).Error
 	if err != nil {
 		return nil, err
 	}
