@@ -68,7 +68,7 @@ func (h *HttpInstructorHandle) GetAllInstructors(c *fiber.Ctx) error {
 		})
 	}
 
-	return c.JSON(instructors)
+	return c.Status(fiber.StatusOK).JSON(instructors)
 }
 
 func (h *HttpInstructorHandle) UpdateInstructor(c *fiber.Ctx) error {
@@ -93,7 +93,10 @@ func (h *HttpInstructorHandle) UpdateInstructor(c *fiber.Ctx) error {
 		})
 	}
 
-	return c.JSON(instructor)
+	return c.Status(fiber.StatusOK).JSON(fiber.Map{
+		"message":    "Instructor updated successfully",
+		"instructor": instructor,
+	})
 }
 
 func (h *HttpInstructorHandle) DeleteInstructor(c *fiber.Ctx) error {
@@ -110,8 +113,7 @@ func (h *HttpInstructorHandle) DeleteInstructor(c *fiber.Ctx) error {
 		})
 	}
 
-	c.Status(fiber.StatusNoContent)
-	return c.JSON(fiber.Map{
+	return c.Status(fiber.StatusNoContent).JSON(fiber.Map{
 		"message": "Instructor deleted successfully",
 	})
 }
