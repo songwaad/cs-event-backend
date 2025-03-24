@@ -3,8 +3,8 @@ package entities
 type Notification struct {
 	ID             uint `json:"id" gorm:"primaryKey"`
 	Active         bool `json:"active"`
-	UserId         User
+	UserId         string
 	User           User
-	EventDetailsID EventDetails
+	EventDetailsID uint
 	EventDetails   EventDetails
 }
