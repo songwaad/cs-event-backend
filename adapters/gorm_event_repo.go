@@ -20,6 +20,14 @@ func NewGormEventRepo(DB *gorm.DB) usecases.EventRepo {
 
 func (r *GormEventRepo) Create(event *entities.Event) error {
 	return r.DB.Debug().Transaction(func(tx *gorm.DB) error {
+		// บันทึก Result ก่อน
+		if err := tx.Create(&event.EventDetails.EventResult).Error; err != nil {
+			return err
+		}
+
+		// กำหนด EventResultID ให้ EventDetails
+		event.EventDetails.EventResultID = event.EventDetails.EventResult.ID
+
 		// บันทึก EventDetails ก่อน
 		if err := tx.Create(&event.EventDetails).Error; err != nil {
 			return err
@@ -77,7 +85,8 @@ func (r *GormEventRepo) GetByID(id int) (*entities.Event, error) {
 		Preload("EventDetails.ResponsibleUsers", func(db *gorm.DB) *gorm.DB {
 			return db.Select("id", "first_name", "lastname")
 		}).
-		Preload("EventDetails.EventStatus").
+		Preload("EventDetails.EventResult").
+		Preload("EventStatus").
 		Preload("EventDetails").
 		Preload("User", func(db *gorm.DB) *gorm.DB {
 			return db.Select("id", "first_name", "lastname")
@@ -103,7 +112,8 @@ func (r *GormEventRepo) GetAll() ([]entities.Event, error) {
 		Preload("EventDetails.ResponsibleUsers", func(db *gorm.DB) *gorm.DB {
 			return db.Select("id", "first_name", "lastname")
 		}).
-		Preload("EventDetails.EventStatus").
+		Preload("EventDetails.EventResult").
+		Preload("EventStatus").
 		Preload("EventDetails").
 		Preload("User", func(db *gorm.DB) *gorm.DB {
 			return db.Select("id", "first_name", "lastname")
@@ -175,6 +185,11 @@ func (r *GormEventRepo) Delete(id int) error {
 		var event entities.Event
 		if err := tx.First(&event, id).Error; err != nil {
 			return fmt.Errorf("event with ID %d not found", id)
+		}
+
+		// Soft Delete EventResult
+		if err := tx.Model(&event.EventDetails.EventResult).Update("DeletedAt", time.Now()).Error; err != nil {
+			return err
 		}
 
 		// Soft Delete EventDetails

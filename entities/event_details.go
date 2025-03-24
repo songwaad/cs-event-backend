@@ -24,8 +24,8 @@ type EventDetails struct {
 	Methodology       string    `json:"methodology"`
 	HasBudget         bool      `json:"has_budget"`
 	Monitoring        string    `json:"monitoring"`
-	EventStatusID     uint
-	EventStatus       EventStatus
+	EventResultID     uint
+	EventResult       EventResult
 	Instructor        []Instructor `gorm:"many2many:event_instructor;"`
 	ResponsibleUsers  []User       `gorm:"many2many:event_responsible;"`
 }

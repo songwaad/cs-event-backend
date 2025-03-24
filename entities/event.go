@@ -13,4 +13,6 @@ type Event struct {
 	EventDetails   EventDetails
 	CreatedBy      string `json:"created_by"`
 	User           User   `gorm:"foreignKey:CreatedBy"`
+	EventStatusID  uint
+	EventStatus    EventStatus
 }
