@@ -5,26 +5,18 @@ import (
 )
 
 type EventDetails struct {
-	ID        uint       `json:"id" gorm:"primaryKey"`
-	CreatedAt time.Time  `json:"created_at"`
-	UpdatedAt time.Time  `json:"updated_at"`
-	DeletedAt *time.Time `json:"deleted_at,omitempty"`
-
-	Name              string `json:"name" gorm:"unique"`
-	Year              int    `json:"year"`
-	EventTypeStatusID EventTypeStatus
+	ID                uint       `json:"id" gorm:"primaryKey"`
+	Name              string     `json:"name" gorm:"unique"`
+	DeleteAt          *time.Time `gorm:"index"`
+	EventTypeStatusID uint
 	EventTypeStatus   EventTypeStatus
-	EventPlaneID      EventPlane
+	EventPlaneID      uint
 	EventPlane        EventPlane
-	EventTypeID       EventType
+	EventTypeID       uint
 	EventType         EventType
-	Rationale         string `json:"retionale"`
-	EventStrategyID   EventStrategy
+	Rationale         string `json:"rationale"`
+	EventStrategyID   uint
 	EventStrategy     EventStrategy
-	EventGoalID       EventGoal
-	EventGoal         EventGoal
-	EventTacticID     EventTactic
-	EventTactic       EventTactic
 	Objective         string    `json:"objective"`
 	StartDate         time.Time `json:"start_date"`
 	EndDate           time.Time `json:"end_date"`
@@ -32,8 +24,8 @@ type EventDetails struct {
 	Methodology       string    `json:"methodology"`
 	HasBudget         bool      `json:"has_budget"`
 	Monitoring        string    `json:"monitoring"`
-	EventStatusID     EventStatus
+	EventStatusID     uint
 	EventStatus       EventStatus
 	Instructor        []Instructor `gorm:"many2many:event_instructor;"`
-	ResponsibleUsers  []User       `gorm:"many2many:event_reponsible;"`
+	ResponsibleUsers  []User       `gorm:"many2many:event_responsible;"`
 }
