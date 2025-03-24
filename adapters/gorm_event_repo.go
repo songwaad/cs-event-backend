@@ -170,11 +170,34 @@ func (r *GormEventRepo) Update(event *entities.Event) error {
 			event.EventDetails.Instructor = instructors
 		}
 
+		oldStatusID := existingEvent.EventStatusID
+		newStatusID := event.EventStatusID
+
 		// อัปเดต Event และความสัมพันธ์ทั้งหมด
 		if err := tx.Save(event).Error; err != nil {
 			return err
 		}
 
+		// ถ้าเปลี่ยนจากสถานะอื่นเป็น 4 สร้าง Notification
+		if oldStatusID != 4 && newStatusID == 4 {
+			// ดึง User ทั้งหมด
+			var allUsers []entities.User
+			if err := tx.Find(&allUsers).Error; err != nil {
+				return err
+			}
+
+			// สร้าง Notification สำหรับทุก User
+			for _, user := range allUsers {
+				notification := entities.Notification{
+					Active:         true,
+					UserId:         user.ID,
+					EventDetailsID: event.EventDetails.ID,
+				}
+				if err := tx.Create(notification).Error; err != nil {
+					return err
+				}
+			}
+		}
 		return nil
 	})
 }
