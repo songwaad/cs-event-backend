@@ -1,5 +1,120 @@
 basePath: /
 definitions:
+  entities.Event:
+    properties:
+      created_at:
+        type: string
+      created_by:
+        type: string
+      deleted_at:
+        type: string
+      eventDetails:
+        $ref: '#/definitions/entities.EventDetails'
+      eventDetailsID:
+        type: integer
+      id:
+        type: integer
+      updated_at:
+        type: string
+      user:
+        $ref: '#/definitions/entities.User'
+      year:
+        type: integer
+    type: object
+  entities.EventDetails:
+    properties:
+      end_date:
+        type: string
+      eventPlane:
+        $ref: '#/definitions/entities.EventPlane'
+      eventPlaneID:
+        type: integer
+      eventStatus:
+        $ref: '#/definitions/entities.EventStatus'
+      eventStatusID:
+        type: integer
+      eventStrategy:
+        $ref: '#/definitions/entities.EventStrategy'
+      eventStrategyID:
+        type: integer
+      eventType:
+        $ref: '#/definitions/entities.EventType'
+      eventTypeID:
+        type: integer
+      eventTypeStatus:
+        $ref: '#/definitions/entities.EventTypeStatus'
+      eventTypeStatusID:
+        type: integer
+      has_budget:
+        type: boolean
+      id:
+        type: integer
+      instructor:
+        items:
+          $ref: '#/definitions/entities.Instructor'
+        type: array
+      location:
+        type: string
+      methodology:
+        type: string
+      monitoring:
+        type: string
+      name:
+        type: string
+      objective:
+        type: string
+      rationale:
+        type: string
+      responsibleUsers:
+        items:
+          $ref: '#/definitions/entities.User'
+        type: array
+      start_date:
+        type: string
+    type: object
+  entities.EventPlane:
+    properties:
+      id:
+        type: integer
+      work:
+        type: string
+      work_plane:
+        type: string
+    type: object
+  entities.EventStatus:
+    properties:
+      id:
+        type: integer
+      status:
+        type: string
+    type: object
+  entities.EventStrategy:
+    properties:
+      goal:
+        type: string
+      id:
+        type: integer
+      strategy:
+        $ref: '#/definitions/entities.Strategy'
+      strategyID:
+        type: integer
+      tactic:
+        type: string
+    type: object
+  entities.EventType:
+    properties:
+      id:
+        type: integer
+      type:
+        type: string
+    type: object
+  entities.EventTypeStatus:
+    properties:
+      id:
+        type: integer
+      status:
+        type: string
+    type: object
   entities.Instructor:
     properties:
       created_at:
@@ -8,6 +123,10 @@ definitions:
         type: string
       description:
         type: string
+      eventDetails:
+        items:
+          $ref: '#/definitions/entities.EventDetails'
+        type: array
       firstname:
         type: string
       id:
@@ -17,6 +136,60 @@ definitions:
       updated_at:
         type: string
     type: object
+  entities.Strategy:
+    properties:
+      id:
+        type: integer
+      strategy:
+        type: string
+    type: object
+  entities.User:
+    properties:
+      createdAt:
+        type: string
+      deleteAt:
+        type: string
+      email:
+        type: string
+      eventDetails:
+        items:
+          $ref: '#/definitions/entities.EventDetails'
+        type: array
+      firstName:
+        type: string
+      id:
+        type: string
+      lastname:
+        type: string
+      password:
+        type: string
+      status:
+        type: string
+      updatedAt:
+        type: string
+      userRole:
+        $ref: '#/definitions/entities.UserRole'
+      userRoleID:
+        type: integer
+      userStatus:
+        $ref: '#/definitions/entities.UserStatus'
+      userStatusID:
+        type: integer
+    type: object
+  entities.UserRole:
+    properties:
+      id:
+        type: integer
+      role:
+        type: string
+    type: object
+  entities.UserStatus:
+    properties:
+      id:
+        type: integer
+      status:
+        type: string
+    type: object
 host: localhost:8080
 info:
   contact: {}
@@ -24,13 +197,222 @@ info:
   title: ComSci Event API
   version: "1.0"
 paths:
-  /Instructors:
+  /auth/login:
+    post:
+      consumes:
+      - application/json
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/entities.User'
+            type: array
+      security:
+      - ApiKeyAuth: []
+      summary: Login
+      tags:
+      - User
+  /auth/logout:
+    post:
+      consumes:
+      - application/json
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/entities.User'
+            type: array
+      security:
+      - ApiKeyAuth: []
+      summary: Logout
+      tags:
+      - User
+  /auth/register:
+    post:
+      consumes:
+      - application/json
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            items:
+              $ref: '#/definitions/entities.User'
+            type: array
+      security:
+      - ApiKeyAuth: []
+      summary: Register
+      tags:
+      - User
+  /event/:id:
+    delete:
+      consumes:
+      - application/json
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: No Content
+          schema:
+            items:
+              $ref: '#/definitions/entities.Event'
+            type: array
+      security:
+      - ApiKeyAuth: []
+      summary: Delete Event
+      tags:
+      - Event
     get:
       consumes:
       - application/json
-      description: |-
-        Get details of all Instructors
-        Instructor struct with Gorm Model and soft delete
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/entities.Event'
+            type: array
+      security:
+      - ApiKeyAuth: []
+      summary: Get Event By ID
+      tags:
+      - Event
+    post:
+      consumes:
+      - application/json
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            items:
+              $ref: '#/definitions/entities.Event'
+            type: array
+      security:
+      - ApiKeyAuth: []
+      summary: Create Event
+      tags:
+      - Event
+    put:
+      consumes:
+      - application/json
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            items:
+              $ref: '#/definitions/entities.Event'
+            type: array
+      security:
+      - ApiKeyAuth: []
+      summary: Update Event
+      tags:
+      - Event
+  /events:
+    get:
+      consumes:
+      - application/json
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/entities.Event'
+            type: array
+      security:
+      - ApiKeyAuth: []
+      summary: Get All Events
+      tags:
+      - Event
+  /instructor:
+    post:
+      consumes:
+      - application/json
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            items:
+              $ref: '#/definitions/entities.Instructor'
+            type: array
+      security:
+      - ApiKeyAuth: []
+      summary: Create Instructor
+      tags:
+      - Instructor
+  /instructor/:id:
+    delete:
+      consumes:
+      - application/json
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: No Content
+          schema:
+            items:
+              $ref: '#/definitions/entities.Instructor'
+            type: array
+      security:
+      - ApiKeyAuth: []
+      summary: Delete Instructor
+      tags:
+      - Instructor
+    get:
+      consumes:
+      - application/json
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/entities.Instructor'
+            type: array
+      security:
+      - ApiKeyAuth: []
+      summary: Get Instructor By ID
+      tags:
+      - Instructor
+    put:
+      consumes:
+      - application/json
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/entities.Instructor'
+            type: array
+      security:
+      - ApiKeyAuth: []
+      summary: Update Instructor
+      tags:
+      - Instructor
+  /instructors:
+    get:
+      consumes:
+      - application/json
+      description: Get details of all Instructors
       produces:
       - application/json
       responses:
@@ -44,7 +426,77 @@ paths:
       - ApiKeyAuth: []
       summary: Get all Instructors
       tags:
-      - Instructors
+      - Instructor
+  /user/:id:
+    delete:
+      consumes:
+      - application/json
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: No Content
+          schema:
+            items:
+              $ref: '#/definitions/entities.User'
+            type: array
+      security:
+      - ApiKeyAuth: []
+      summary: Delete User
+      tags:
+      - User
+    get:
+      consumes:
+      - application/json
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/entities.User'
+            type: array
+      security:
+      - ApiKeyAuth: []
+      summary: Get User By ID
+      tags:
+      - User
+    put:
+      consumes:
+      - application/json
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            items:
+              $ref: '#/definitions/entities.User'
+            type: array
+      security:
+      - ApiKeyAuth: []
+      summary: Update User
+      tags:
+      - User
+  /users:
+    get:
+      consumes:
+      - application/json
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/entities.User'
+            type: array
+      security:
+      - ApiKeyAuth: []
+      summary: Get All Users
+      tags:
+      - User
 schemes:
 - http
 securityDefinitions:
