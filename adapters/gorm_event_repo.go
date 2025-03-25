@@ -228,3 +228,28 @@ func (r *GormEventRepo) Delete(id int) error {
 		return nil
 	})
 }
+
+func (r *GormEventRepo) GetCalendarEvents() ([]entities.CalendarResponse, error) {
+	var eventDetails []entities.EventDetails
+	result := r.DB.
+		Preload("EventType").
+		Where("delete_at IS NULL").
+		Order("start_date ASC").
+		Find(&eventDetails)
+	if result.Error != nil {
+		return nil, result.Error
+	}
+
+	calendarEvents := make([]entities.CalendarResponse, 0, len(eventDetails))
+	for _, event := range eventDetails {
+		calendarEvents = append(calendarEvents, entities.CalendarResponse{
+			ID:        event.ID,
+			Name:      event.Name,
+			StartDate: event.StartDate,
+			EndDate:   event.EndDate,
+			Location:  event.Location,
+			EventType: event.EventType.Type,
+		})
+	}
+	return calendarEvents, nil
+}

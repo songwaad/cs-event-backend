@@ -163,3 +163,23 @@ func (h *HttpEventHandle) DeleteEvent(c *fiber.Ctx) error {
 
 	return c.SendStatus(fiber.StatusNoContent)
 }
+
+// GetCalendar godoc
+// @Summary Retrieve event calendar
+// @Description Get all event details, sorted by start date
+// @Tags Calendar
+// @Accept json
+// @Produce json
+// @Security ApiKeyAuth
+// @Success 200 {array} entities.CalendarResponse
+// @Failure 500 {object} map[string]interface{}
+// @Router /calendar [get]
+func (h *HttpEventHandle) GetCalendar(c *fiber.Ctx) error {
+	events, err := h.eventUseCase.GetCalendarEvents()
+	if err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"error": err.Error(),
+		})
+	}
+	return c.Status(fiber.StatusOK).JSON(events)
+}

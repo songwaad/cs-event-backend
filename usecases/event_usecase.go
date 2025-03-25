@@ -8,6 +8,7 @@ type EventUseCase interface {
 	GetAllEvents() ([]entities.Event, error)
 	UpdateEvent(event *entities.Event) error
 	DeleteEvent(id int) error
+	GetCalendarEvents() ([]entities.CalendarResponse, error)
 }
 
 type EventService struct {
@@ -36,4 +37,8 @@ func (s *EventService) UpdateEvent(event *entities.Event) error {
 
 func (s *EventService) DeleteEvent(id int) error {
 	return s.repo.Delete(id)
+}
+
+func (s *EventService) GetCalendarEvents() ([]entities.CalendarResponse, error) {
+	return s.repo.GetCalendarEvents()
 }

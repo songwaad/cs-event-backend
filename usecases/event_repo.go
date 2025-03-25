@@ -10,4 +10,5 @@ type EventRepo interface {
 	GetAll() ([]entities.Event, error)
 	Update(event *entities.Event) error
 	Delete(id int) error
+	GetCalendarEvents() ([]entities.CalendarResponse, error)
 }
