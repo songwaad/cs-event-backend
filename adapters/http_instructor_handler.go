@@ -14,14 +14,17 @@ func NewHttpInstructorHandle(instructorUseCase usecases.InstructorUseCase) *Http
 	return &HttpInstructorHandle{instructorUseCase: instructorUseCase}
 }
 
-// Handler functions
 // CreateInstructor godoc
-// @Summary Create Instructor
+// @Summary Create a new instructor
+// @Description Create a new instructor with the provided details
 // @Tags Instructor
 // @Accept  json
 // @Produce  json
 // @Security ApiKeyAuth
-// @Success 201 {array} entities.Instructor
+// @Param instructor body entities.Instructor true "Instructor object"
+// @Success 201 {object} map[string]interface{}
+// @Failure 400 {object} map[string]interface{}
+// @Failure 500 {object} map[string]interface{}
 // @Router /instructor [post]
 func (h *HttpInstructorHandle) CreateInstructor(c *fiber.Ctx) error {
 	var instructor entities.Instructor
@@ -40,15 +43,18 @@ func (h *HttpInstructorHandle) CreateInstructor(c *fiber.Ctx) error {
 	return c.Status(fiber.StatusCreated).JSON(instructor)
 }
 
-// Handler functions
 // GetInstructorByID godoc
-// @Summary Get Instructor By ID
+// @Summary Get an instructor by ID
+// @Description Retrieve an instructor by its ID
 // @Tags Instructor
-// @Accept  json
-// @Produce  json
+// @Accept json
+// @Produce json
 // @Security ApiKeyAuth
-// @Success 200 {array} entities.Instructor
-// @Router /instructor/:id [get]
+// @Param id path int true "Instructor ID"
+// @Success 200 {object} entities.Instructor
+// @Failure 400 {object} map[string]interface{}
+// @Failure 404 {object} map[string]interface{}
+// @Router /instructor/{id} [get]
 func (h *HttpInstructorHandle) GetInstructorByID(c *fiber.Ctx) error {
 	id, err := c.ParamsInt("id")
 	if err != nil {
@@ -67,15 +73,15 @@ func (h *HttpInstructorHandle) GetInstructorByID(c *fiber.Ctx) error {
 	return c.Status(fiber.StatusOK).JSON(instructor)
 }
 
-// Handler functions
 // GetAllInstructors godoc
-// @Summary Get all Instructors
-// @Description Get details of all Instructors
+// @Summary Get all instructors
+// @Description Retrieve a list of all instructors
 // @Tags Instructor
-// @Accept  json
-// @Produce  json
+// @Accept json
+// @Produce json
 // @Security ApiKeyAuth
 // @Success 200 {array} entities.Instructor
+// @Failure 500 {object} map[string]interface{}
 // @Router /instructors [get]
 func (h *HttpInstructorHandle) GetAllInstructors(c *fiber.Ctx) error {
 	instructors, err := h.instructorUseCase.GetAllInstructors()
@@ -88,15 +94,19 @@ func (h *HttpInstructorHandle) GetAllInstructors(c *fiber.Ctx) error {
 	return c.Status(fiber.StatusOK).JSON(instructors)
 }
 
-// Handler functions
 // UpdateInstructor godoc
-// @Summary Update Instructor
+// @Summary Update an instructor
+// @Description Update an existing instructor by ID
 // @Tags Instructor
-// @Accept  json
-// @Produce  json
+// @Accept json
+// @Produce json
 // @Security ApiKeyAuth
-// @Success 200 {array} entities.Instructor
-// @Router /instructor/:id [put]
+// @Param id path int true "Instructor ID"
+// @Param instructor body entities.Instructor true "Updated instructor object"
+// @Success 200 {object} map[string]interface{}
+// @Failure 400 {object} map[string]interface{}
+// @Failure 500 {object} map[string]interface{}
+// @Router /instructor/{id} [put]
 func (h *HttpInstructorHandle) UpdateInstructor(c *fiber.Ctx) error {
 	id, err := c.ParamsInt("id")
 	if err != nil {
@@ -125,15 +135,18 @@ func (h *HttpInstructorHandle) UpdateInstructor(c *fiber.Ctx) error {
 	})
 }
 
-// Handler functions
 // DeleteInstructor godoc
-// @Summary Delete Instructor
+// @Summary Delete an instructor
+// @Description Delete an instructor by ID
 // @Tags Instructor
-// @Accept  json
-// @Produce  json
+// @Accept json
+// @Produce json
 // @Security ApiKeyAuth
-// @Success 204 {array} entities.Instructor
-// @Router /instructor/:id [delete]
+// @Param id path int true "Instructor ID"
+// @Success 204 {object} nil
+// @Failure 400 {object} map[string]interface{}
+// @Failure 500 {object} map[string]interface{}
+// @Router /instructor/{id} [delete]
 func (h *HttpInstructorHandle) DeleteInstructor(c *fiber.Ctx) error {
 	id, err := c.ParamsInt("id")
 	if err != nil {

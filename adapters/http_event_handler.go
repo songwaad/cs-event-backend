@@ -14,15 +14,18 @@ func NewHttpEventHandle(eventUseCase usecases.EventUseCase) *HttpEventHandle {
 	return &HttpEventHandle{eventUseCase: eventUseCase}
 }
 
-// Handler functions
 // CreateEvent godoc
-// @Summary Create Event
+// @Summary Create a new event
+// @Description Create a new event with the provided details
 // @Tags Event
-// @Accept  json
-// @Produce  json
+// @Accept json
+// @Produce json
 // @Security ApiKeyAuth
-// @Success 201 {array} entities.Event
-// @Router /event/:id [post]
+// @Param event body entities.Event true "Event object"
+// @Success 201 {object} entities.Event
+// @Failure 400 {object} map[string]interface{}
+// @Failure 500 {object} map[string]interface{}
+// @Router /event [post]
 func (h *HttpEventHandle) CreateEvent(c *fiber.Ctx) error {
 	var event entities.Event
 	if err := c.BodyParser(&event); err != nil {
@@ -40,15 +43,18 @@ func (h *HttpEventHandle) CreateEvent(c *fiber.Ctx) error {
 	return c.Status(fiber.StatusCreated).JSON(event)
 }
 
-// Handler functions
 // GetEventByID godoc
-// @Summary Get Event By ID
+// @Summary Get an event by ID
+// @Description Retrieve an event by its ID
 // @Tags Event
-// @Accept  json
-// @Produce  json
+// @Accept json
+// @Produce json
 // @Security ApiKeyAuth
-// @Success 200 {array} entities.Event
-// @Router /event/:id [get]
+// @Param id path int true "Event ID"
+// @Success 200 {object} entities.Event
+// @Failure 400 {object} map[string]interface{}
+// @Failure 404 {object} map[string]interface{}
+// @Router /event/{id} [get]
 func (h *HttpEventHandle) GetEventByID(c *fiber.Ctx) error {
 	id, err := c.ParamsInt("id")
 	if err != nil {
@@ -67,14 +73,15 @@ func (h *HttpEventHandle) GetEventByID(c *fiber.Ctx) error {
 	return c.Status(fiber.StatusOK).JSON(event)
 }
 
-// Handler functions
 // GetAllEvents godoc
-// @Summary Get All Events
+// @Summary Get all events
+// @Description Retrieve a list of all events
 // @Tags Event
-// @Accept  json
-// @Produce  json
+// @Accept json
+// @Produce json
 // @Security ApiKeyAuth
 // @Success 200 {array} entities.Event
+// @Failure 500 {object} map[string]interface{}
 // @Router /events [get]
 func (h *HttpEventHandle) GetAllEvents(c *fiber.Ctx) error {
 	events, err := h.eventUseCase.GetAllEvents()
@@ -87,15 +94,19 @@ func (h *HttpEventHandle) GetAllEvents(c *fiber.Ctx) error {
 	return c.Status(fiber.StatusOK).JSON(events)
 }
 
-// Handler functions
 // UpdateEvent godoc
-// @Summary Update Event
+// @Summary Update an event
+// @Description Update an existing event by ID
 // @Tags Event
-// @Accept  json
-// @Produce  json
+// @Accept json
+// @Produce json
 // @Security ApiKeyAuth
-// @Success 201 {array} entities.Event
-// @Router /event/:id [put]
+// @Param id path int true "Event ID"
+// @Param event body entities.Event true "Updated event object"
+// @Success 200 {object} map[string]interface{}
+// @Failure 400 {object} map[string]interface{}
+// @Failure 500 {object} map[string]interface{}
+// @Router /event/{id} [put]
 func (h *HttpEventHandle) UpdateEvent(c *fiber.Ctx) error {
 	id, err := c.ParamsInt("id")
 	if err != nil {
@@ -124,15 +135,18 @@ func (h *HttpEventHandle) UpdateEvent(c *fiber.Ctx) error {
 	})
 }
 
-// Handler functions
 // DeleteEvent godoc
-// @Summary Delete Event
+// @Summary Delete an event
+// @Description Delete an event by ID
 // @Tags Event
-// @Accept  json
-// @Produce  json
+// @Accept json
+// @Produce json
 // @Security ApiKeyAuth
-// @Success 204 {array} entities.Event
-// @Router /event/:id [delete]
+// @Param id path int true "Event ID"
+// @Success 204 {object} nil
+// @Failure 400 {object} map[string]interface{}
+// @Failure 500 {object} map[string]interface{}
+// @Router /event/{id} [delete]
 func (h *HttpEventHandle) DeleteEvent(c *fiber.Ctx) error {
 	id, err := c.ParamsInt("id")
 	if err != nil {

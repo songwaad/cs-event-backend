@@ -17,14 +17,16 @@ func NewUserHandler(userUseCase usecases.UserUseCase) *UserHandler {
 	return &UserHandler{UserUseCase: userUseCase}
 }
 
-// Handler functions
 // Register godoc
-// @Summary Register
+// @Summary Register a new user
+// @Description Register a new user with email and password
 // @Tags User
-// @Accept  json
-// @Produce  json
-// @Security ApiKeyAuth
-// @Success 201 {array} entities.User
+// @Accept json
+// @Produce json
+// @Param user body entities.User true "User object"
+// @Success 201 {object} entities.User
+// @Failure 400 {object} map[string]interface{}
+// @Failure 500 {object} map[string]interface{}
 // @Router /auth/register [post]
 func (h *UserHandler) Register(c *fiber.Ctx) error {
 	var user entities.User
@@ -56,14 +58,16 @@ func (h *UserHandler) Register(c *fiber.Ctx) error {
 	})
 }
 
-// Handler functions
 // Login godoc
-// @Summary Login
+// @Summary Login a user
+// @Description Authenticate a user and return a JWT token
 // @Tags User
-// @Accept  json
-// @Produce  json
-// @Security ApiKeyAuth
-// @Success 200 {array} entities.User
+// @Accept json
+// @Produce json
+// @Param credentials body object{email=string,password=string} true "Login credentials"
+// @Success 200 {object} map[string]interface{}
+// @Failure 400 {object} map[string]interface{}
+// @Failure 500 {object} map[string]interface{}
 // @Router /auth/login [post]
 func (h *UserHandler) Login(c *fiber.Ctx, jwtSecretKey string) error {
 	var input struct {
@@ -108,15 +112,17 @@ func (h *UserHandler) Login(c *fiber.Ctx, jwtSecretKey string) error {
 	})
 }
 
-// Handler functions
 // GetUserByID godoc
-// @Summary Get User By ID
+// @Summary Get a user by ID
+// @Description Retrieve a user by its ID
 // @Tags User
-// @Accept  json
-// @Produce  json
+// @Accept json
+// @Produce json
 // @Security ApiKeyAuth
-// @Success 200 {array} entities.User
-// @Router /user/:id [get]
+// @Param id path string true "User ID"
+// @Success 200 {object} entities.User
+// @Failure 404 {object} map[string]interface{}
+// @Router /user/{id} [get]
 func (h *UserHandler) GetUserByID(c *fiber.Ctx) error {
 	userID := c.Params("id")
 
@@ -131,14 +137,15 @@ func (h *UserHandler) GetUserByID(c *fiber.Ctx) error {
 	return c.Status(fiber.StatusOK).JSON(user)
 }
 
-// Handler functions
 // GetAllUsers godoc
-// @Summary Get All Users
+// @Summary Get all users
+// @Description Retrieve a list of all users
 // @Tags User
-// @Accept  json
-// @Produce  json
+// @Accept json
+// @Produce json
 // @Security ApiKeyAuth
 // @Success 200 {array} entities.User
+// @Failure 500 {object} map[string]interface{}
 // @Router /users [get]
 func (h *UserHandler) GetAllUsers(c *fiber.Ctx) error {
 	users, err := h.UserUseCase.GetAllUsers()
@@ -155,15 +162,19 @@ func (h *UserHandler) GetAllUsers(c *fiber.Ctx) error {
 	return c.Status(fiber.StatusOK).JSON(users)
 }
 
-// Handler functions
-// Update User godoc
-// @Summary Update User
+// UpdateUser godoc
+// @Summary Update a user
+// @Description Update an existing user by ID
 // @Tags User
-// @Accept  json
-// @Produce  json
+// @Accept json
+// @Produce json
 // @Security ApiKeyAuth
-// @Success 201 {array} entities.User
-// @Router /user/:id [put]
+// @Param id path string true "User ID"
+// @Param user body entities.User true "Updated user object"
+// @Success 200 {object} map[string]interface{}
+// @Failure 400 {object} map[string]interface{}
+// @Failure 500 {object} map[string]interface{}
+// @Router /user/{id} [put]
 func (h *UserHandler) UpdateUser(c *fiber.Ctx) error {
 	userId := c.Params("id")
 
@@ -189,15 +200,17 @@ func (h *UserHandler) UpdateUser(c *fiber.Ctx) error {
 	})
 }
 
-// Handler functions
 // DeleteUser godoc
-// @Summary Delete User
+// @Summary Delete a user
+// @Description Delete a user by ID
 // @Tags User
-// @Accept  json
-// @Produce  json
+// @Accept json
+// @Produce json
 // @Security ApiKeyAuth
-// @Success 204 {array} entities.User
-// @Router /user/:id [delete]
+// @Param id path string true "User ID"
+// @Success 204 {object} nil
+// @Failure 500 {object} map[string]interface{}
+// @Router /user/{id} [delete]
 func (h *UserHandler) DeleteUser(c *fiber.Ctx) error {
 	userID := c.Params("id")
 
@@ -210,14 +223,14 @@ func (h *UserHandler) DeleteUser(c *fiber.Ctx) error {
 	return c.SendStatus(fiber.StatusNoContent)
 }
 
-// Handler functions
 // Logout godoc
-// @Summary Logout
+// @Summary Logout a user
+// @Description Clear the JWT cookie and log out the user
 // @Tags User
-// @Accept  json
-// @Produce  json
+// @Accept json
+// @Produce json
 // @Security ApiKeyAuth
-// @Success 200 {array} entities.User
+// @Success 200 {object} map[string]interface{}
 // @Router /auth/logout [post]
 func (h *UserHandler) Logout(c *fiber.Ctx) error {
 	c.Cookie(&fiber.Cookie{
