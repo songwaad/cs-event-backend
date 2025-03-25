@@ -1,16 +1,35 @@
 basePath: /
 definitions:
+  entities.CalendarResponse:
+    properties:
+      endDate:
+        type: string
+      eventType:
+        type: string
+      id:
+        type: integer
+      location:
+        type: string
+      name:
+        type: string
+      startDate:
+        type: string
+    type: object
   entities.Event:
     properties:
       created_at:
         type: string
       created_by:
         type: string
-      deleted_at:
+      deletedAt:
         type: string
       eventDetails:
         $ref: '#/definitions/entities.EventDetails'
       eventDetailsID:
+        type: integer
+      eventStatus:
+        $ref: '#/definitions/entities.EventStatus'
+      eventStatusID:
         type: integer
       id:
         type: integer
@@ -23,15 +42,17 @@ definitions:
     type: object
   entities.EventDetails:
     properties:
+      deleteAt:
+        type: string
       end_date:
         type: string
       eventPlane:
         $ref: '#/definitions/entities.EventPlane'
       eventPlaneID:
         type: integer
-      eventStatus:
-        $ref: '#/definitions/entities.EventStatus'
-      eventStatusID:
+      eventResult:
+        $ref: '#/definitions/entities.EventResult'
+      eventResultID:
         type: integer
       eventStrategy:
         $ref: '#/definitions/entities.EventStrategy'
@@ -81,6 +102,25 @@ definitions:
       work_plane:
         type: string
     type: object
+  entities.EventResult:
+    properties:
+      deletedAt:
+        type: string
+      id:
+        type: integer
+      product:
+        type: string
+      productIndicators:
+        type: string
+      productTarget:
+        type: string
+      result:
+        type: string
+      resultIndicators:
+        type: string
+      resultTarget:
+        type: string
+    type: object
   entities.EventStatus:
     properties:
       id:
@@ -119,7 +159,7 @@ definitions:
     properties:
       created_at:
         type: string
-      deleted_at:
+      deleteAt:
         type: string
       description:
         type: string
@@ -134,6 +174,21 @@ definitions:
       lastname:
         type: string
       updated_at:
+        type: string
+    type: object
+  entities.Notification:
+    properties:
+      active:
+        type: boolean
+      eventDetails:
+        $ref: '#/definitions/entities.EventDetails'
+      eventDetailsID:
+        type: integer
+      id:
+        type: integer
+      user:
+        $ref: '#/definitions/entities.User'
+      userId:
         type: string
     type: object
   entities.Strategy:
@@ -201,77 +256,95 @@ paths:
     post:
       consumes:
       - application/json
+      description: Authenticate a user and return a JWT token
+      parameters:
+      - description: Login credentials
+        in: body
+        name: credentials
+        required: true
+        schema:
+          properties:
+            email:
+              type: string
+            password:
+              type: string
+          type: object
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            items:
-              $ref: '#/definitions/entities.User'
-            type: array
-      security:
-      - ApiKeyAuth: []
-      summary: Login
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Login a user
       tags:
       - User
   /auth/logout:
     post:
       consumes:
       - application/json
+      description: Clear the JWT cookie and log out the user
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            items:
-              $ref: '#/definitions/entities.User'
-            type: array
+            additionalProperties: true
+            type: object
       security:
       - ApiKeyAuth: []
-      summary: Logout
+      summary: Logout a user
       tags:
       - User
   /auth/register:
     post:
       consumes:
       - application/json
+      description: Register a new user with email and password
+      parameters:
+      - description: User object
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/entities.User'
       produces:
       - application/json
       responses:
         "201":
           description: Created
           schema:
-            items:
-              $ref: '#/definitions/entities.User'
-            type: array
-      security:
-      - ApiKeyAuth: []
-      summary: Register
+            $ref: '#/definitions/entities.User'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Register a new user
       tags:
       - User
-  /event/:id:
-    delete:
-      consumes:
-      - application/json
-      produces:
-      - application/json
-      responses:
-        "204":
-          description: No Content
-          schema:
-            items:
-              $ref: '#/definitions/entities.Event'
-            type: array
-      security:
-      - ApiKeyAuth: []
-      summary: Delete Event
-      tags:
-      - Event
+  /calendar:
     get:
       consumes:
       - application/json
+      description: Get all event details, sorted by start date
       produces:
       - application/json
       responses:
@@ -279,51 +352,159 @@ paths:
           description: OK
           schema:
             items:
-              $ref: '#/definitions/entities.Event'
+              $ref: '#/definitions/entities.CalendarResponse'
             type: array
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
       security:
       - ApiKeyAuth: []
-      summary: Get Event By ID
+      summary: Retrieve event calendar
       tags:
-      - Event
+      - Calendar
+  /event:
     post:
       consumes:
       - application/json
+      description: Create a new event with the provided details
+      parameters:
+      - description: Event object
+        in: body
+        name: event
+        required: true
+        schema:
+          $ref: '#/definitions/entities.Event'
       produces:
       - application/json
       responses:
         "201":
           description: Created
           schema:
-            items:
-              $ref: '#/definitions/entities.Event'
-            type: array
+            $ref: '#/definitions/entities.Event'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
       security:
       - ApiKeyAuth: []
-      summary: Create Event
+      summary: Create a new event
+      tags:
+      - Event
+  /event/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete an event by ID
+      parameters:
+      - description: Event ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: No Content
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - ApiKeyAuth: []
+      summary: Delete an event
+      tags:
+      - Event
+    get:
+      consumes:
+      - application/json
+      description: Retrieve an event by its ID
+      parameters:
+      - description: Event ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/entities.Event'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - ApiKeyAuth: []
+      summary: Get an event by ID
       tags:
       - Event
     put:
       consumes:
       - application/json
+      description: Update an existing event by ID
+      parameters:
+      - description: Event ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Updated event object
+        in: body
+        name: event
+        required: true
+        schema:
+          $ref: '#/definitions/entities.Event'
       produces:
       - application/json
       responses:
-        "201":
-          description: Created
+        "200":
+          description: OK
           schema:
-            items:
-              $ref: '#/definitions/entities.Event'
-            type: array
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
       security:
       - ApiKeyAuth: []
-      summary: Update Event
+      summary: Update an event
       tags:
       - Event
   /events:
     get:
       consumes:
       - application/json
+      description: Retrieve a list of all events
       produces:
       - application/json
       responses:
@@ -333,86 +514,158 @@ paths:
             items:
               $ref: '#/definitions/entities.Event'
             type: array
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
       security:
       - ApiKeyAuth: []
-      summary: Get All Events
+      summary: Get all events
       tags:
       - Event
   /instructor:
     post:
       consumes:
       - application/json
+      description: Create a new instructor with the provided details
+      parameters:
+      - description: Instructor object
+        in: body
+        name: instructor
+        required: true
+        schema:
+          $ref: '#/definitions/entities.Instructor'
       produces:
       - application/json
       responses:
         "201":
           description: Created
           schema:
-            items:
-              $ref: '#/definitions/entities.Instructor'
-            type: array
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
       security:
       - ApiKeyAuth: []
-      summary: Create Instructor
+      summary: Create a new instructor
       tags:
       - Instructor
-  /instructor/:id:
+  /instructor/{id}:
     delete:
       consumes:
       - application/json
+      description: Delete an instructor by ID
+      parameters:
+      - description: Instructor ID
+        in: path
+        name: id
+        required: true
+        type: integer
       produces:
       - application/json
       responses:
         "204":
           description: No Content
+        "400":
+          description: Bad Request
           schema:
-            items:
-              $ref: '#/definitions/entities.Instructor'
-            type: array
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
       security:
       - ApiKeyAuth: []
-      summary: Delete Instructor
+      summary: Delete an instructor
       tags:
       - Instructor
     get:
       consumes:
       - application/json
+      description: Retrieve an instructor by its ID
+      parameters:
+      - description: Instructor ID
+        in: path
+        name: id
+        required: true
+        type: integer
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            items:
-              $ref: '#/definitions/entities.Instructor'
-            type: array
+            $ref: '#/definitions/entities.Instructor'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties: true
+            type: object
       security:
       - ApiKeyAuth: []
-      summary: Get Instructor By ID
+      summary: Get an instructor by ID
       tags:
       - Instructor
     put:
       consumes:
       - application/json
+      description: Update an existing instructor by ID
+      parameters:
+      - description: Instructor ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Updated instructor object
+        in: body
+        name: instructor
+        required: true
+        schema:
+          $ref: '#/definitions/entities.Instructor'
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            items:
-              $ref: '#/definitions/entities.Instructor'
-            type: array
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
       security:
       - ApiKeyAuth: []
-      summary: Update Instructor
+      summary: Update an instructor
       tags:
       - Instructor
   /instructors:
     get:
       consumes:
       - application/json
-      description: Get details of all Instructors
+      description: Retrieve a list of all instructors
       produces:
       - application/json
       responses:
@@ -422,32 +675,92 @@ paths:
             items:
               $ref: '#/definitions/entities.Instructor'
             type: array
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
       security:
       - ApiKeyAuth: []
-      summary: Get all Instructors
+      summary: Get all instructors
       tags:
       - Instructor
-  /user/:id:
+  /notifications/{id}:
     delete:
       consumes:
       - application/json
+      description: Delete a notification by its ID
+      parameters:
+      - description: Notification ID
+        in: path
+        name: id
+        required: true
+        type: integer
       produces:
       - application/json
       responses:
         "204":
           description: No Content
+        "400":
+          description: Bad Request
           schema:
-            items:
-              $ref: '#/definitions/entities.User'
-            type: array
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
       security:
       - ApiKeyAuth: []
-      summary: Delete User
+      summary: Delete a notification
       tags:
-      - User
+      - Notification
+  /notifications/{id}/inactive:
+    patch:
+      consumes:
+      - application/json
+      description: Deactivate a notification by setting its active status to false
+      parameters:
+      - description: Notification ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - ApiKeyAuth: []
+      summary: Deactivate a notification
+      tags:
+      - Notification
+  /notifications/user/{id}:
     get:
       consumes:
       - application/json
+      description: Retrieve all notifications for a specific user by their ID
+      parameters:
+      - description: User ID
+        in: path
+        name: id
+        required: true
+        type: string
       produces:
       - application/json
       responses:
@@ -455,34 +768,115 @@ paths:
           description: OK
           schema:
             items:
-              $ref: '#/definitions/entities.User'
+              $ref: '#/definitions/entities.Notification'
             type: array
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties: true
+            type: object
       security:
       - ApiKeyAuth: []
-      summary: Get User By ID
+      summary: Get notifications by user ID
+      tags:
+      - Notification
+  /user/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete a user by ID
+      parameters:
+      - description: User ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: No Content
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - ApiKeyAuth: []
+      summary: Delete a user
+      tags:
+      - User
+    get:
+      consumes:
+      - application/json
+      description: Retrieve a user by its ID
+      parameters:
+      - description: User ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/entities.User'
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - ApiKeyAuth: []
+      summary: Get a user by ID
       tags:
       - User
     put:
       consumes:
       - application/json
+      description: Update an existing user by ID
+      parameters:
+      - description: User ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Updated user object
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/entities.User'
       produces:
       - application/json
       responses:
-        "201":
-          description: Created
+        "200":
+          description: OK
           schema:
-            items:
-              $ref: '#/definitions/entities.User'
-            type: array
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
       security:
       - ApiKeyAuth: []
-      summary: Update User
+      summary: Update a user
       tags:
       - User
   /users:
     get:
       consumes:
       - application/json
+      description: Retrieve a list of all users
       produces:
       - application/json
       responses:
@@ -492,9 +886,14 @@ paths:
             items:
               $ref: '#/definitions/entities.User'
             type: array
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
       security:
       - ApiKeyAuth: []
-      summary: Get All Users
+      summary: Get all users
       tags:
       - User
 schemes:
