@@ -106,7 +106,7 @@ func (h *HttpBudgetHandle) GetAllBudgets(c *fiber.Ctx) error {
 // @Success 200 {object} map[string]interface{}
 // @Failure 400 {object} map[string]interface{}
 // @Failure 500 {object} map[string]interface{}
-// @Router /ิudgets/{id} [put]
+// @Router /budgets/{id} [put]
 func (h *HttpBudgetHandle) UpdateBudget(c *fiber.Ctx) error {
 	id, err := c.ParamsInt("id")
 	if err != nil {
