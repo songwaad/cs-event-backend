@@ -4,7 +4,7 @@ import "github.com/songwaad/cs-event-backend/entities"
 
 type NotificationUsecase interface {
 	GetNotifyByUserID(userID string) ([]entities.Notification, error)
-	InActive() error
+	InActive(id uint) error
 	DeleteNotify(id uint) error
 }
 
@@ -20,8 +20,8 @@ func (s *NotificationService) GetNotifyByUserID(userID string) ([]entities.Notif
 	return s.repo.GetByUserID(userID)
 }
 
-func (s *NotificationService) InActive() error {
-	return s.repo.InActive()
+func (s *NotificationService) InActive(id uint) error {
+	return s.repo.InActive(id)
 }
 
 func (s *NotificationService) DeleteNotify(id uint) error {
