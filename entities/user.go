@@ -11,7 +11,7 @@ type User struct {
 	DeleteAt     *time.Time `gorm:"index"`
 	Email        string     `gorm:"unique"`
 	Password     string
-	FirstName    string
+	FirstName    string `json:"firstname"`
 	Lastname     string
 	UserRoleID   uint
 	UserRole     UserRole
