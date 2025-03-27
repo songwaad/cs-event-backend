@@ -10,7 +10,7 @@ type GormNotificationRepo struct {
 	DB *gorm.DB
 }
 
-func NewGormNotification(DB *gorm.DB) usecases.NotificationRepo {
+func NewGormNotificationRepo(DB *gorm.DB) usecases.NotificationRepo {
 	return &GormNotificationRepo{DB: DB}
 }
 
