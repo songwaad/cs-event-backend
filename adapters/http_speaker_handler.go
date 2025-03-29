@@ -36,7 +36,6 @@ func (h *HttpSpeakerHandle) CreateSpeaker(c *fiber.Ctx) error {
 	}
 
 	speaker := entities.Speaker{
-		SpeakerID:   input.SpeakerID,
 		FirstName:   input.FirstName,
 		Lastname:    input.Lastname,
 		Description: input.Description,
@@ -48,7 +47,7 @@ func (h *HttpSpeakerHandle) CreateSpeaker(c *fiber.Ctx) error {
 		})
 	}
 
-	creatSpeaker, err := h.speakerUseCase.GetSpeakerByID(input.SpeakerID)
+	creatSpeaker, err := h.speakerUseCase.GetSpeakerByID(speaker.SpeakerID)
 	if err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
 			"message": "failed to retrieve created Speaker",
