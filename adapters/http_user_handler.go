@@ -24,8 +24,8 @@ func NewUserHandler(userUseCase usecases.UserUseCase) *UserHandler {
 // @Tags User
 // @Accept json
 // @Produce json
-// @Param user body entities.User true "User registration details"
-// @Success 201 {object} entities.User "User successfully created"
+// @Param user body dto.UserRegisterDTO true "User registration details"
+// @Success 201 {object} dto.UserRegisterDTO "User successfully created"
 // @Failure 400 {object} map[string]interface{} "Bad request due to invalid or missing input"
 // @Failure 500 {object} map[string]interface{} "Internal server error"
 // @Router /auth/register [post]
