@@ -22,7 +22,7 @@ func NewHttpSpeakerHandle(speakerUseCase usecases.SpeakerUseCase) *HttpSpeakerHa
 // @Accept json
 // @Produce json
 // @Security ApiKeyAuth
-// @Param speaker body entities.Speaker true "Speaker details"
+// @Param speaker body dto.SpeakerDTO true "Speaker details"
 // @Success 201 {object} map[string]interface{} "Speaker created successfully"
 // @Failure 400 {object} map[string]interface{} "Invalid input"
 // @Failure 500 {object} map[string]interface{} "Internal server error"
