@@ -96,7 +96,7 @@ func (h *HttpSpeakerHandle) GetSpeakerByID(c *fiber.Ctx) error {
 // GetAllSpeakers godoc
 // @Summary Get all Speakers
 // @Description Retrieve a list of all speakers
-// @Tags Speakers
+// @Tags Speaker
 // @Accept json
 // @Produce json
 // @Security ApiKeyAuth
