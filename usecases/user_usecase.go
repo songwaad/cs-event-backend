@@ -96,7 +96,12 @@ func (s *UserService) ChangePassword(userID string, oldPassword string, newPassw
 		return errors.New("Old password is incorrect")
 	}
 
-	user.Password = newPassword
+	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(newPassword), bcrypt.DefaultCost)
+	if err != nil {
+		return err
+	}
+
+	user.Password = string(hashedPassword)
 	return s.repo.UpdateUser(user)
 }
 
