@@ -44,6 +44,7 @@ func (h *UserHandler) Register(c *fiber.Ctx) error {
 	}
 
 	user := entities.User{
+		UserID:       input.UserID,
 		Email:        input.Email,
 		Password:     input.Password,
 		FirstName:    input.FirstName,
