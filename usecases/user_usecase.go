@@ -10,10 +10,12 @@ import (
 type UserUseCase interface {
 	Register(user *entities.User) error
 	Login(email, password string) (*entities.User, error)
-	GetUserByID(id string) (*entities.User, error)
+	GetUserByID(userID string) (*entities.User, error)
 	GetAllUsers() ([]entities.User, error)
-	UpdateUser(user *entities.User) error
-	DeleteUser(id string) error
+	DeleteUser(userID string) error
+	ChangePassword(userID string, oldPassword string, newPassword string) error
+	UpdateUserRole(userID string, userRoleID uint) error
+	UpdateUserStatus(userID string, userStatusID uint) error
 }
 
 type UserService struct {
@@ -59,50 +61,61 @@ func (s *UserService) Login(email, password string) (*entities.User, error) {
 	return user, nil
 }
 
-func (s *UserService) GetUserByID(id string) (*entities.User, error) {
-	if id == "" {
+func (s *UserService) GetUserByID(userID string) (*entities.User, error) {
+	if userID == "" {
 		return nil, errors.New("user ID is required")
 	}
 
-	return s.repo.GetUserByID(id)
+	return s.repo.GetUserByID(userID)
 }
 
 func (s *UserService) GetAllUsers() ([]entities.User, error) {
 	return s.repo.GetAllUsers()
 }
 
-func (s *UserService) UpdateUser(user *entities.User) error {
-	if user.ID == "" {
+func (s *UserService) DeleteUser(userID string) error {
+	if userID == "" {
 		return errors.New("user ID is required")
 	}
 
-	existingUser, err := s.repo.GetUserByID(user.ID)
+	_, err := s.repo.GetUserByID(userID)
 	if err != nil {
 		return err
 	}
 
-	if user.Password != "" && user.Password != existingUser.Password {
-		hashedPassword, err := bcrypt.GenerateFromPassword([]byte(user.Password), bcrypt.DefaultCost)
-		if err != nil {
-			return err
-		}
-		user.Password = string(hashedPassword)
-	} else {
-		user.Password = existingUser.Password
+	return s.repo.DeleteUser(userID)
+}
+
+func (s *UserService) ChangePassword(userID string, oldPassword string, newPassword string) error {
+	user, err := s.repo.GetUserByID(userID)
+	if err != nil {
+		return errors.New("user not found")
 	}
 
+	if err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(oldPassword)); err != nil {
+		return errors.New("Old password is incorrect")
+	}
+
+	user.Password = newPassword
 	return s.repo.UpdateUser(user)
 }
 
-func (s *UserService) DeleteUser(id string) error {
-	if id == "" {
-		return errors.New("user ID is required")
-	}
-
-	_, err := s.repo.GetUserByID(id)
+func (s *UserService) UpdateUserRole(userID string, userRoleID uint) error {
+	user, err := s.repo.GetUserByID(userID)
 	if err != nil {
-		return err
+		return errors.New("user not found")
 	}
 
-	return s.repo.DeleteUser(id)
+	user.UserRoleID = userRoleID
+	return s.repo.UpdateUser(user)
+}
+
+func (s *UserService) UpdateUserStatus(userID string, userStatusID uint) error {
+	user, err := s.repo.GetUserByID(userID)
+	if err != nil {
+		return errors.New("user not found")
+	}
+
+	user.UserStatusID = userStatusID
+	return s.repo.UpdateUser(user)
 }
