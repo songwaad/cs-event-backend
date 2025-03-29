@@ -29,7 +29,7 @@ func (r *GormUserRepo) GetUserByEmail(email string) (*entities.User, error) {
 
 func (r *GormUserRepo) GetUserByID(userID string) (*entities.User, error) {
 	var user entities.User
-	err := r.DB.Preload("UserRole").Preload("UserStatus").Where("id = ?", userID).First(&user).Error
+	err := r.DB.Preload("UserRole").Preload("UserStatus").Where("user_id = ?", userID).First(&user).Error
 	if err != nil {
 		return nil, err
 	}
@@ -46,7 +46,10 @@ func (r *GormUserRepo) GetAllUsers() ([]entities.User, error) {
 }
 
 func (r *GormUserRepo) UpdateUser(user *entities.User) error {
-	return r.DB.Save(user).Error
+	return r.DB.Model(&entities.User{}).Where("user_id = ?", user.UserID).Updates(map[string]interface{}{
+		"user_role_id":   user.UserRoleID,
+		"user_status_id": user.UserStatusID,
+	}).Error
 }
 
 func (r *GormUserRepo) DeleteUser(userID string) error {
