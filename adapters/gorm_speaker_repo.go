@@ -18,9 +18,9 @@ func (r *GormSpeakerRepo) Create(speaker *entities.Speaker) error {
 	return r.DB.Create(speaker).Error
 }
 
-func (r *GormSpeakerRepo) GetByID(id int) (*entities.Speaker, error) {
+func (r *GormSpeakerRepo) GetByID(speakerID uint) (*entities.Speaker, error) {
 	var speaker entities.Speaker
-	result := r.DB.First(&speaker, id)
+	result := r.DB.First(&speaker, speakerID)
 	if result.Error != nil {
 		return nil, result.Error
 	}
@@ -40,6 +40,6 @@ func (r *GormSpeakerRepo) Update(speaker *entities.Speaker) error {
 	return r.DB.Save(speaker).Error
 }
 
-func (r *GormSpeakerRepo) Delete(id int) error {
-	return r.DB.Delete(&entities.Speaker{}, id).Error
+func (r *GormSpeakerRepo) Delete(speakerID uint) error {
+	return r.DB.Delete(&entities.Speaker{}, speakerID).Error
 }
