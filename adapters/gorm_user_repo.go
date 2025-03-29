@@ -46,9 +46,18 @@ func (r *GormUserRepo) GetAllUsers() ([]entities.User, error) {
 }
 
 func (r *GormUserRepo) UpdateUser(user *entities.User) error {
-	return r.DB.Model(&entities.User{}).Where("user_id = ?", user.UserID).Updates(map[string]interface{}{
-		"user_role_id":   user.UserRoleID,
-		"user_status_id": user.UserStatusID,
+	return r.DB.Model(&entities.User{}).Where("user_id = ?", user.UserID).Save(*user).Error
+}
+
+func (r *GormUserRepo) UpdateUserRole(userID string, userRoleID uint) error {
+	return r.DB.Model(&entities.User{}).Where("user_id = ?", userID).Updates(map[string]interface{}{
+		"user_role_id": userRoleID,
+	}).Error
+}
+
+func (r *GormUserRepo) UpdateUserStatus(userID string, userStatusID uint) error {
+	return r.DB.Model(&entities.User{}).Where("user_id = ?", userID).Updates(map[string]interface{}{
+		"user_status_id": userStatusID,
 	}).Error
 }
 
