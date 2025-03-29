@@ -2,6 +2,7 @@ package adapters
 
 import (
 	"github.com/gofiber/fiber/v2"
+	"github.com/songwaad/cs-event-backend/dto"
 	"github.com/songwaad/cs-event-backend/entities"
 	"github.com/songwaad/cs-event-backend/usecases"
 )
@@ -16,148 +17,189 @@ func NewHttpSpeakerHandle(speakerUseCase usecases.SpeakerUseCase) *HttpSpeakerHa
 
 // CreateSpeaker godoc
 // @Summary Create a new Speaker
-// @Description Create a new Speaker with the provided details
+// @Description Creates a new speaker by providing the speaker's first name, last name, and description
 // @Tags Speaker
-// @Accept  json
-// @Produce  json
+// @Accept json
+// @Produce json
 // @Security ApiKeyAuth
-// @Param Speaker body entities.Speaker true "Speaker object"
-// @Success 201 {object} map[string]interface{}
-// @Failure 400 {object} map[string]interface{}
-// @Failure 500 {object} map[string]interface{}
+// @Param speaker body entities.Speaker true "Speaker details"
+// @Success 201 {object} map[string]interface{} "Speaker created successfully"
+// @Failure 400 {object} map[string]interface{} "Invalid input"
+// @Failure 500 {object} map[string]interface{} "Internal server error"
 // @Router /speaker [post]
 func (h *HttpSpeakerHandle) CreateSpeaker(c *fiber.Ctx) error {
-	var instructor entities.Speaker
-	if err := c.BodyParser(&instructor); err != nil {
+	var input entities.Speaker
+	if err := c.BodyParser(&input); err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
 			"error": "invalid request",
 		})
 	}
 
-	if err := h.speakerUseCase.CreateSpeaker(&instructor); err != nil {
+	speaker := entities.Speaker{
+		SpeakerID:   input.SpeakerID,
+		FirstName:   input.FirstName,
+		Lastname:    input.Lastname,
+		Description: input.Description,
+	}
+
+	if err := h.speakerUseCase.CreateSpeaker(&speaker); err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
 			"error": err.Error(),
 		})
 	}
 
-	return c.Status(fiber.StatusCreated).JSON(instructor)
+	creatSpeaker, err := h.speakerUseCase.GetSpeakerByID(input.SpeakerID)
+	if err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"message": "failed to retrieve created Speaker",
+		})
+	}
+
+	response := dto.ToSpeakerResponseDTO(*creatSpeaker)
+	return c.Status(fiber.StatusCreated).JSON(fiber.Map{
+		"message": "Speaker created successfully",
+		"speaker": response,
+	})
 }
 
 // GetSpeakerByID godoc
-// @Summary Get an Speaker by ID
-// @Description Retrieve an Speaker by its ID
+// @Summary Get a Speaker by ID
+// @Description Retrieve a speaker's details by their unique speaker ID
 // @Tags Speaker
 // @Accept json
 // @Produce json
 // @Security ApiKeyAuth
 // @Param id path int true "Speaker ID"
-// @Success 200 {object} entities.Speaker
-// @Failure 400 {object} map[string]interface{}
-// @Failure 404 {object} map[string]interface{}
+// @Success 200 {object} dto.SpeakerDTO "Speaker details retrieved successfully"
+// @Failure 400 {object} map[string]interface{} "Invalid ID format"
+// @Failure 404 {object} map[string]interface{} "Speaker not found"
 // @Router /speaker/{id} [get]
 func (h *HttpSpeakerHandle) GetSpeakerByID(c *fiber.Ctx) error {
-	id, err := c.ParamsInt("id")
+	speakerID, err := c.ParamsInt("id")
 	if err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
 			"error": "invalid id",
 		})
 	}
 
-	speaker, err := h.speakerUseCase.GetSpeakerByID(id)
+	speaker, err := h.speakerUseCase.GetSpeakerByID(uint(speakerID))
 	if err != nil {
 		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{
 			"error": err.Error(),
 		})
 	}
 
-	return c.Status(fiber.StatusOK).JSON(speaker)
+	response := dto.ToSpeakerResponseDTO(*speaker)
+	return c.Status(fiber.StatusOK).JSON(response)
 }
 
 // GetAllSpeakers godoc
 // @Summary Get all Speakers
-// @Description Retrieve a list of all Speakers
+// @Description Retrieve a list of all speakers
 // @Tags Speakers
 // @Accept json
 // @Produce json
 // @Security ApiKeyAuth
-// @Success 200 {array} entities.Speaker
-// @Failure 500 {object} map[string]interface{}
+// @Success 200 {array} dto.SpeakerDTO "List of all speakers"
+// @Failure 500 {object} map[string]interface{} "Internal server error"
 // @Router /speakers [get]
 func (h *HttpSpeakerHandle) GetAllSpeakers(c *fiber.Ctx) error {
 	speakers, err := h.speakerUseCase.GetAllSpeakers()
 	if err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
-			"error": err.Error(),
+			"message": err.Error(),
 		})
 	}
 
-	return c.Status(fiber.StatusOK).JSON(speakers)
+	var responses []dto.SpeakerDTO
+
+	for _, speaker := range speakers {
+		response := dto.ToSpeakerResponseDTO(speaker)
+		responses = append(responses, response)
+	}
+
+	return c.Status(fiber.StatusOK).JSON(responses)
 }
 
 // UpdateSpeaker godoc
-// @Summary Update an Speaker
-// @Description Update an existing Speaker by ID
+// @Summary Update an existing Speaker
+// @Description Update a speaker's details (first name, last name, description) by their unique speaker ID
 // @Tags Speaker
 // @Accept json
 // @Produce json
 // @Security ApiKeyAuth
 // @Param id path int true "Speaker ID"
-// @Param Speaker body entities.Speaker true "Updated Speaker object"
-// @Success 200 {object} map[string]interface{}
-// @Failure 400 {object} map[string]interface{}
-// @Failure 500 {object} map[string]interface{}
+// @Param speaker body dto.SpeakerDTO true "Updated speaker details"
+// @Success 200 {object} map[string]interface{} "Speaker updated successfully"
+// @Failure 400 {object} map[string]interface{} "Invalid input or speaker ID"
+// @Failure 500 {object} map[string]interface{} "Internal server error"
 // @Router /speaker/{id} [put]
 func (h *HttpSpeakerHandle) UpdateSpeaker(c *fiber.Ctx) error {
-	id, err := c.ParamsInt("id")
+	speakerID, err := c.ParamsInt("id")
 	if err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
-			"error": "invalid id",
+			"error": "invalid speaker_id",
 		})
 	}
 
-	var speaker entities.Speaker
-	if err := c.BodyParser(&speaker); err != nil {
+	var input dto.SpeakerDTO
+	if err := c.BodyParser(&input); err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
 			"error": "invalid request",
 		})
 	}
 
-	speaker.ID = uint(id)
+	input.SpeakerID = uint(speakerID)
+	speaker := entities.Speaker{
+		SpeakerID:   input.SpeakerID,
+		FirstName:   input.FirstName,
+		Lastname:    input.Lastname,
+		Description: input.Description,
+	}
+
 	if err := h.speakerUseCase.UpdateSpeaker(&speaker); err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
 			"error": err.Error(),
 		})
 	}
 
+	updatedSpeaker, err := h.speakerUseCase.GetSpeakerByID(input.SpeakerID)
+	if err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"message": "failed to retrieve created Speaker",
+		})
+	}
+
+	response := dto.ToSpeakerResponseDTO(*updatedSpeaker)
 	return c.Status(fiber.StatusOK).JSON(fiber.Map{
 		"message": "Speaker updated successfully",
-		"speaker": speaker,
+		"speaker": response,
 	})
 }
 
 // DeleteSpeaker godoc
-// @Summary Delete an speaker
-// @Description Delete an speaker by ID
+// @Summary Delete a speaker
+// @Description Delete a speaker by their unique speaker ID
 // @Tags Speaker
 // @Accept json
 // @Produce json
 // @Security ApiKeyAuth
 // @Param id path int true "Speaker ID"
-// @Success 204 {object} nil
-// @Failure 400 {object} map[string]interface{}
-// @Failure 500 {object} map[string]interface{}
+// @Success 204 {object} nil "Speaker deleted successfully"
+// @Failure 400 {object} map[string]interface{} "Invalid speaker ID"
+// @Failure 500 {object} map[string]interface{} "Internal server error"
 // @Router /speaker/{id} [delete]
 func (h *HttpSpeakerHandle) DeleteSpeaker(c *fiber.Ctx) error {
-	id, err := c.ParamsInt("id")
+	speakerID, err := c.ParamsInt("id")
 	if err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
 			"error": "invalid id",
 		})
 	}
 
-	if err := h.speakerUseCase.DeleteSpeaker(id); err != nil {
+	if err := h.speakerUseCase.DeleteSpeaker(uint(speakerID)); err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
-			"error": err.Error(),
+			"message": err.Error(),
 		})
 	}
 
