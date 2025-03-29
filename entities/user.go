@@ -5,18 +5,19 @@ import (
 )
 
 type User struct {
-	ID           string `gorm:"primaryKey"`
-	CreatedAt    time.Time
-	UpdatedAt    time.Time
-	DeleteAt     *time.Time `gorm:"index"`
-	Email        string     `gorm:"unique"`
+	UserID    string     `json:"user_id" gorm:"primaryKey"`
+	CreatedAt time.Time  `json:"created_at"`
+	UpdatedAt time.Time  `json:"updated_at"`
+	DeletedAt *time.Time `json:"deleted_at" gorm:"index"`
+
+	Email        string `gorm:"unique"`
 	Password     string
-	FirstName    string `json:"firstname"`
+	FirstName    string `json:"first_name"`
 	Lastname     string
-	UserRoleID   uint
+	UserRoleID   uint `json:"user_role_id"`
 	UserRole     UserRole
-	UserStatusID uint
+	UserStatusID uint `json:"user_status_id"`
 	UserStatus   UserStatus
 	Status       string
-	EventDetails []EventDetails `gorm:"many2many:event_responsible;"`
+	// Event        []Event `gorm:"many2many:event_responsible;"`
 }

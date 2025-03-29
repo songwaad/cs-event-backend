@@ -1,6 +1,6 @@
 package entities
 
 type UserRole struct {
-	ID   uint   `json:"id" gorm:"primaryKey"`
-	Role string `json:"role"`
+	UserRoleID uint   `json:"user_role_id" gorm:"primaryKey"`
+	Role       string `json:"role"`
 }

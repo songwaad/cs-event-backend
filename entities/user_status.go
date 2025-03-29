@@ -1,6 +1,6 @@
 package entities
 
 type UserStatus struct {
-	ID     uint   `json:"id" gorm:"primaryKey"`
-	Status string `json:"status"`
+	UserStatusID uint   `json:"user_status_id" gorm:"primaryKey"`
+	Status       string `json:"status"`
 }
