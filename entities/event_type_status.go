@@ -1,6 +1,6 @@
 package entities
 
 type EventTypeStatus struct {
-	ID     uint   `json:"id" gorm:"primaryKey"`
-	Status string `json:"status"`
+	EventTypeStatusID uint   `json:"event_type_status_id" gorm:"primaryKey"`
+	Status            string `json:"status"`
 }
