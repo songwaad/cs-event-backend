@@ -10,5 +10,7 @@ type UserRepo interface {
 	GetUserByID(id string) (*entities.User, error)
 	GetAllUsers() ([]entities.User, error)
 	UpdateUser(user *entities.User) error
+	UpdateUserRole(userID string, userRoleID uint) error
+	UpdateUserStatus(userID string, userStatusID uint) error
 	DeleteUser(id string) error
 }

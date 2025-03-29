@@ -106,21 +106,9 @@ func (s *UserService) ChangePassword(userID string, oldPassword string, newPassw
 }
 
 func (s *UserService) UpdateUserRole(userID string, userRoleID uint) error {
-	user, err := s.repo.GetUserByID(userID)
-	if err != nil {
-		return errors.New("user not found")
-	}
-
-	user.UserRoleID = userRoleID
-	return s.repo.UpdateUser(user)
+	return s.repo.UpdateUserRole(userID, userRoleID)
 }
 
 func (s *UserService) UpdateUserStatus(userID string, userStatusID uint) error {
-	user, err := s.repo.GetUserByID(userID)
-	if err != nil {
-		return errors.New("user not found")
-	}
-
-	user.UserStatusID = userStatusID
-	return s.repo.UpdateUser(user)
+	return s.repo.UpdateUserStatus(userID, userStatusID)
 }
