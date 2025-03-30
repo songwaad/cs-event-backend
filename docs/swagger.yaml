@@ -1,5 +1,29 @@
 basePath: /
 definitions:
+  dto.BudgetDTO:
+    properties:
+      amount:
+        type: number
+      description:
+        type: string
+      eventID:
+        type: integer
+      id:
+        type: integer
+    type: object
+  dto.CalendarResponseDTO:
+    properties:
+      endDate:
+        type: string
+      eventType:
+        type: string
+      location:
+        type: string
+      name:
+        type: string
+      startDate:
+        type: string
+    type: object
   dto.EventCreateDTO:
     properties:
       created_by_user_id:
@@ -112,6 +136,11 @@ definitions:
       year:
         type: integer
     type: object
+  dto.EventStatusUpdateDTO:
+    properties:
+      event_status_id:
+        type: integer
+    type: object
   dto.EventStrategyResponseDTO:
     properties:
       event_strategy_id:
@@ -121,6 +150,17 @@ definitions:
       strategy:
         type: string
       tactic:
+        type: string
+    type: object
+  dto.NotifyResponseDTO:
+    properties:
+      active:
+        type: boolean
+      event_id:
+        type: integer
+      id:
+        type: integer
+      user_id:
         type: string
     type: object
   dto.SpeakerDTO:
@@ -279,6 +319,11 @@ paths:
           schema:
             additionalProperties: true
             type: object
+        "401":
+          description: Unauthorized - only users with status_id = 2 can login
+          schema:
+            additionalProperties: true
+            type: object
         "500":
           description: Internal server error
           schema:
@@ -338,6 +383,200 @@ paths:
       summary: Register a new user
       tags:
       - User
+  /budget:
+    post:
+      consumes:
+      - application/json
+      description: Create a new Budget with the provided details
+      parameters:
+      - description: Budget object
+        in: body
+        name: Budget
+        required: true
+        schema:
+          $ref: '#/definitions/dto.BudgetDTO'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - ApiKeyAuth: []
+      summary: Create a new Budget
+      tags:
+      - Budget
+  /budget/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete a Budget by ID
+      parameters:
+      - description: Budget ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: No Content
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - ApiKeyAuth: []
+      summary: Delete a Budget
+      tags:
+      - Budget
+    get:
+      consumes:
+      - application/json
+      description: Retrieve a Budget by ID
+      parameters:
+      - description: Budget ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.BudgetDTO'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - ApiKeyAuth: []
+      summary: Get a Budget by ID
+      tags:
+      - Budget
+  /budgets:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve a list of all Budgets
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/dto.BudgetDTO'
+            type: array
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - ApiKeyAuth: []
+      summary: Get all Budgets
+      tags:
+      - Budget
+  /budgets/{id}:
+    put:
+      consumes:
+      - application/json
+      description: Update an existing Budget by ID
+      parameters:
+      - description: Budget ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Updated Budget object
+        in: body
+        name: Budget
+        required: true
+        schema:
+          $ref: '#/definitions/dto.BudgetDTO'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - ApiKeyAuth: []
+      summary: Update an existing Budget
+      tags:
+      - Budget
+  /event:
+    post:
+      consumes:
+      - application/json
+      description: Create a new event in the system
+      parameters:
+      - description: Event information
+        in: body
+        name: event
+        required: true
+        schema:
+          $ref: '#/definitions/dto.EventCreateDTO'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Successfully created event
+          schema:
+            $ref: '#/definitions/dto.EventResponseDTO'
+        "400":
+          description: Bad request
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Create a new event
+      tags:
+      - Event
   /event-strategies:
     get:
       consumes:
@@ -400,60 +639,7 @@ paths:
       summary: Get an event strategy by ID
       tags:
       - Event Strategy
-  /events:
-    get:
-      consumes:
-      - application/json
-      description: Retrieve all events from the system
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: Successfully retrieved all events
-          schema:
-            items:
-              $ref: '#/definitions/dto.EventResponseDTO'
-            type: array
-        "500":
-          description: Internal server error
-          schema:
-            additionalProperties: true
-            type: object
-      summary: Get all events
-      tags:
-      - Event
-    post:
-      consumes:
-      - application/json
-      description: Create a new event in the system
-      parameters:
-      - description: Event information
-        in: body
-        name: event
-        required: true
-        schema:
-          $ref: '#/definitions/dto.EventCreateDTO'
-      produces:
-      - application/json
-      responses:
-        "201":
-          description: Successfully created event
-          schema:
-            $ref: '#/definitions/dto.EventResponseDTO'
-        "400":
-          description: Bad request
-          schema:
-            additionalProperties: true
-            type: object
-        "500":
-          description: Internal server error
-          schema:
-            additionalProperties: true
-            type: object
-      summary: Create a new event
-      tags:
-      - Event
-  /events/{id}:
+  /event/{id}:
     delete:
       consumes:
       - application/json
@@ -561,6 +747,97 @@ paths:
       summary: Update an event
       tags:
       - Event
+  /event/{id}/status:
+    put:
+      consumes:
+      - application/json
+      description: Update only the status of an existing event, if status is 4, notify
+        all users
+      parameters:
+      - description: Event ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: New event status
+        in: body
+        name: status
+        required: true
+        schema:
+          $ref: '#/definitions/dto.EventStatusUpdateDTO'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Successfully updated event status
+          schema:
+            $ref: '#/definitions/dto.EventResponseDTO'
+        "400":
+          description: Bad request
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: Event not found
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - ApiKeyAuth: []
+      summary: Update event status
+      tags:
+      - Event
+  /events:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve all events from the system
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Successfully retrieved all events
+          schema:
+            items:
+              $ref: '#/definitions/dto.EventResponseDTO'
+            type: array
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Get all events
+      tags:
+      - Event
+  /events/calendar:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve all events and return them ordered by start date
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Successfully retrieved all calendar events
+          schema:
+            items:
+              $ref: '#/definitions/dto.CalendarResponseDTO'
+            type: array
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - ApiKeyAuth: []
+      summary: Get all calendar events
+      tags:
+      - Calendar
   /events/plans:
     get:
       consumes:
@@ -649,6 +926,101 @@ paths:
       summary: Get all event type status
       tags:
       - Event
+  /notification/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete a notification by its ID
+      parameters:
+      - description: Notification ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: No Content
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - ApiKeyAuth: []
+      summary: Delete a notification
+      tags:
+      - Notification
+  /notification/{id}/inactive:
+    patch:
+      consumes:
+      - application/json
+      description: Deactivate a notification by setting its active status to false
+      parameters:
+      - description: Notification ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - ApiKeyAuth: []
+      summary: Deactivate a notification
+      tags:
+      - Notification
+  /notification/user/{id}:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve all notifications for a specific user by their ID
+      parameters:
+      - description: User ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/dto.NotifyResponseDTO'
+            type: array
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - ApiKeyAuth: []
+      summary: Get notifications by user ID
+      tags:
+      - Notification
   /speaker:
     post:
       consumes:
