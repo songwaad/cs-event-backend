@@ -15,7 +15,7 @@ func NewGormStrategyRepo(DB *gorm.DB) *GormStrategyRepo {
 
 func (r *GormStrategyRepo) GetAllStrategy() ([]entities.Strategy, error) {
 	var stragies []entities.Strategy
-	result := r.DB.Preload("Strategy").Find(&stragies)
+	result := r.DB.Find(&stragies)
 	if result.Error != nil {
 		return nil, result.Error
 	}
@@ -24,7 +24,7 @@ func (r *GormStrategyRepo) GetAllStrategy() ([]entities.Strategy, error) {
 
 func (r *GormStrategyRepo) GetStrategyByID(strategyID uint) (*entities.Strategy, error) {
 	var strategy entities.Strategy
-	result := r.DB.Preload("Strategy").First(&strategy, strategyID)
+	result := r.DB.First(&strategy, strategyID)
 	if result.Error != nil {
 		return nil, result.Error
 	}
