@@ -82,6 +82,7 @@ func (h *UserHandler) Register(c *fiber.Ctx) error {
 // @Param credentials body object{email=string,password=string} true "Login credentials"
 // @Success 200 {object} map[string]interface{} "Login successful with JWT token"
 // @Failure 400 {object} map[string]interface{} "Bad request due to invalid credentials"
+// @Failure 401 {object} map[string]interface{} "Unauthorized - only users with status_id = 2 can login"
 // @Failure 500 {object} map[string]interface{} "Internal server error"
 // @Router /auth/login [post]
 func (h *UserHandler) Login(c *fiber.Ctx, jwtSecretKey string) error {
@@ -98,6 +99,12 @@ func (h *UserHandler) Login(c *fiber.Ctx, jwtSecretKey string) error {
 			"message": "invalid email or password",
 		})
 
+	}
+
+	if user.UserStatusID != 2 {
+		return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
+			"message": "only users with active status (status_id = 2) can login",
+		})
 	}
 
 	token := jwt.New(jwt.SigningMethodHS256)
