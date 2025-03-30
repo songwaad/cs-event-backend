@@ -24,7 +24,7 @@ func NewHttpNotificationHandler(notificationUseCase usecases.NotificationUsecase
 // @Param id path string true "User ID"
 // @Success 200 {array} dto.NotifyResponseDTO
 // @Failure 404 {object} map[string]interface{}
-// @Router /notifications/user/{id} [get]
+// @Router /notification/user/{id} [get]
 func (h *HttpNotificationHandler) GetNotifyByID(c *fiber.Ctx) error {
 	userID := c.Params("id")
 
@@ -56,7 +56,7 @@ func (h *HttpNotificationHandler) GetNotifyByID(c *fiber.Ctx) error {
 // @Success 200 {object} map[string]interface{}
 // @Failure 400 {object} map[string]interface{}
 // @Failure 500 {object} map[string]interface{}
-// @Router /notifications/{id}/inactive [patch]
+// @Router /notification/{id}/inactive [patch]
 func (h *HttpNotificationHandler) InActive(c *fiber.Ctx) error {
 	id, err := c.ParamsInt("id")
 	if err != nil {
@@ -87,7 +87,7 @@ func (h *HttpNotificationHandler) InActive(c *fiber.Ctx) error {
 // @Success 204 {object} nil
 // @Failure 400 {object} map[string]interface{}
 // @Failure 500 {object} map[string]interface{}
-// @Router /notifications/{id} [delete]
+// @Router /notification/{id} [delete]
 func (h *HttpNotificationHandler) DeleteNotify(c *fiber.Ctx) error {
 	id, err := c.ParamsInt("id")
 	if err != nil {
