@@ -2,6 +2,7 @@ package adapters
 
 import (
 	"github.com/gofiber/fiber/v2"
+	"github.com/songwaad/cs-event-backend/dto"
 	"github.com/songwaad/cs-event-backend/entities"
 	"github.com/songwaad/cs-event-backend/usecases"
 )
@@ -18,20 +19,26 @@ func NewHttpBudgetHandler(budgetUseCase usecases.BudgetUseCase) *HttpBudgetHandl
 // @Summary Create a new Budget
 // @Description Create a new Budget with the provided details
 // @Tags Budget
-// @Accept  json
-// @Produce  json
+// @Accept json
+// @Produce json
 // @Security ApiKeyAuth
-// @Param Budget body entities.Budget true "Budget object"
+// @Param Budget body dto.BudgetDTO true "Budget object"
 // @Success 201 {object} map[string]interface{}
 // @Failure 400 {object} map[string]interface{}
 // @Failure 500 {object} map[string]interface{}
 // @Router /budget [post]
 func (h *HttpBudgetHandle) CreateBudget(c *fiber.Ctx) error {
-	var budget entities.Budget
-	if err := c.BodyParser(&budget); err != nil {
+	var input dto.BudgetDTO
+	if err := c.BodyParser(&input); err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
 			"error": "invalid request",
 		})
+	}
+
+	budget := entities.Budget{
+		EventID:     input.EventID,
+		Amount:      input.Amount,
+		Description: input.Description,
 	}
 
 	if err := h.budgetUseCase.CreateBudget(&budget); err != nil {
@@ -40,18 +47,29 @@ func (h *HttpBudgetHandle) CreateBudget(c *fiber.Ctx) error {
 		})
 	}
 
-	return c.Status(fiber.StatusCreated).JSON(budget)
+	createBudget, err := h.budgetUseCase.GetBudgetByID(budget.BudgetID)
+	if err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"message": "failed to retrieve created Budget",
+		})
+	}
+
+	response := dto.ToBudgetResponseDTO(createBudget)
+	return c.Status(fiber.StatusCreated).JSON(fiber.Map{
+		"message": "Budget created successfully",
+		"budget":  response,
+	})
 }
 
 // GetBudgetByID godoc
-// @Summary Get an Budget by ID
-// @Description Retrieve an Budget by ID
+// @Summary Get a Budget by ID
+// @Description Retrieve a Budget by ID
 // @Tags Budget
 // @Accept json
 // @Produce json
 // @Security ApiKeyAuth
 // @Param id path int true "Budget ID"
-// @Success 200 {object} entities.Budget
+// @Success 200 {object} dto.BudgetDTO
 // @Failure 400 {object} map[string]interface{}
 // @Failure 404 {object} map[string]interface{}
 // @Router /budget/{id} [get]
@@ -63,46 +81,54 @@ func (h *HttpBudgetHandle) GetBudgetByID(c *fiber.Ctx) error {
 		})
 	}
 
-	instructor, err := h.budgetUseCase.GetBudgetByID(uint(id))
+	budget, err := h.budgetUseCase.GetBudgetByID(uint(id))
 	if err != nil {
 		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{
 			"error": err.Error(),
 		})
 	}
 
-	return c.Status(fiber.StatusOK).JSON(instructor)
+	response := dto.ToBudgetResponseDTO(budget)
+	return c.Status(fiber.StatusOK).JSON(response)
 }
 
 // GetAllBudgets godoc
-// @Summary Get all Budget
-// @Description Retrieve a list of all Budget
+// @Summary Get all Budgets
+// @Description Retrieve a list of all Budgets
 // @Tags Budget
 // @Accept json
 // @Produce json
 // @Security ApiKeyAuth
-// @Success 200 {array} entities.Budget
+// @Success 200 {array} dto.BudgetDTO
 // @Failure 500 {object} map[string]interface{}
 // @Router /budgets [get]
 func (h *HttpBudgetHandle) GetAllBudgets(c *fiber.Ctx) error {
-	instructors, err := h.budgetUseCase.GetALLBudgets()
+	budgets, err := h.budgetUseCase.GetALLBudgets()
 	if err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
 			"error": err.Error(),
 		})
 	}
 
-	return c.Status(fiber.StatusOK).JSON(instructors)
+	var responses []dto.BudgetDTO
+
+	for _, budget := range budgets {
+		response := dto.ToBudgetResponseDTO(&budget)
+		responses = append(responses, response)
+	}
+
+	return c.Status(fiber.StatusOK).JSON(responses)
 }
 
 // UpdateBudget godoc
-// @Summary Update an instructor
+// @Summary Update an existing Budget
 // @Description Update an existing Budget by ID
 // @Tags Budget
 // @Accept json
 // @Produce json
 // @Security ApiKeyAuth
 // @Param id path int true "Budget ID"
-// @Param Budget body entities.Budget true "Updated instructor object"
+// @Param Budget body dto.BudgetDTO true "Updated Budget object"
 // @Success 200 {object} map[string]interface{}
 // @Failure 400 {object} map[string]interface{}
 // @Failure 500 {object} map[string]interface{}
@@ -115,29 +141,43 @@ func (h *HttpBudgetHandle) UpdateBudget(c *fiber.Ctx) error {
 		})
 	}
 
-	var budget entities.Budget
-	if err := c.BodyParser(&budget); err != nil {
+	var input dto.BudgetDTO
+	if err := c.BodyParser(&input); err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
 			"error": "invalid request",
 		})
 	}
 
-	budget.ID = uint(id)
+	input.BudgetID = uint(id)
+	budget := entities.Budget{
+		BudgetID:    input.BudgetID,
+		EventID:     input.EventID,
+		Amount:      input.Amount,
+		Description: input.Description,
+	}
 	if err := h.budgetUseCase.UpdateBudget(&budget); err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
 			"error": err.Error(),
 		})
 	}
 
+	updatedBudget, err := h.budgetUseCase.GetBudgetByID(input.BudgetID)
+	if err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"message": "failed to retrieve updated Speaker",
+		})
+	}
+
+	response := dto.ToBudgetResponseDTO(updatedBudget)
 	return c.Status(fiber.StatusOK).JSON(fiber.Map{
-		"message":    "Instructor updated successfully",
-		"instructor": budget,
+		"message": "budget updated successfully",
+		"budget":  response,
 	})
 }
 
-// BudgetInstructor godoc
-// @Summary Delete an Budget
-// @Description Delete an Budget by ID
+// DeleteBudget godoc
+// @Summary Delete a Budget
+// @Description Delete a Budget by ID
 // @Tags Budget
 // @Accept json
 // @Produce json
