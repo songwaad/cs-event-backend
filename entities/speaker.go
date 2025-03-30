@@ -13,5 +13,7 @@ type Speaker struct {
 	FirstName   string `json:"firstname"`
 	Lastname    string `json:"lastname"`
 	Description string `json:"description"`
-	// Event []Event `gorm:"many2many:event_speaker;"`
+
+	// Relationships
+	Event []Event `gorm:"many2many:event_speaker;"`
 }
