@@ -67,6 +67,10 @@ type EventResponseDTO struct {
 	Speakers         []SpeakerDTO      `json:"speakers"`
 }
 
+type EventStatusUpdateDTO struct {
+	EventStatusID uint `json:"event_status_id"`
+}
+
 func ToEventResponseDTO(event *entities.Event) *EventResponseDTO {
 	var responsibleUsers []UserResponseDTO
 	for _, user := range event.ResponsibleUsers {

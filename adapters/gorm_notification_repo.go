@@ -23,6 +23,10 @@ func (r *GormNotificationRepo) GetByUserID(userID string) ([]entities.Notificati
 	return notifications, nil
 }
 
+func (r *GormNotificationRepo) CreateNotify(notify *entities.Notification) error {
+	return r.DB.Create(notify).Error
+}
+
 func (r *GormNotificationRepo) InActive(id uint) error {
 	result := r.DB.Model(&entities.Notification{}).
 		Where("id = ?", id).

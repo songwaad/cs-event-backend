@@ -11,11 +11,17 @@ import (
 )
 
 type HttpEventHandler struct {
-	eventUseCase usecases.EventUseCase
+	eventUseCase  usecases.EventUseCase
+	userUseCase   usecases.UserUseCase
+	notifyUseCase usecases.NotificationUsecase
 }
 
-func NewHttpEventHandler(eventUseCase usecases.EventUseCase) *HttpEventHandler {
-	return &HttpEventHandler{eventUseCase: eventUseCase}
+func NewHttpEventHandler(eventUseCase usecases.EventUseCase, userUseCase usecases.UserUseCase, notifyUseCase usecases.NotificationUsecase) *HttpEventHandler {
+	return &HttpEventHandler{
+		eventUseCase:  eventUseCase,
+		userUseCase:   userUseCase,
+		notifyUseCase: notifyUseCase,
+	}
 }
 
 // GetAllEventTypeStatus godoc
@@ -367,4 +373,82 @@ func (h *HttpEventHandler) GetCalendarEvents(c *fiber.Ctx) error {
 
 	// ส่งผลลัพธ์กลับไปยังผู้ใช้
 	return c.Status(fiber.StatusOK).JSON(calendarResponses)
+}
+
+// UpdateEventStatus godoc
+// @Summary Update event status
+// @Description Update only the status of an existing event, if status is 4, notify all users
+// @Tags Event
+// @Accept json
+// @Produce json
+// @Security ApiKeyAuth
+// @Param id path int true "Event ID"
+// @Param status body dto.EventStatusUpdateDTO true "New event status"
+// @Success 200 {object} dto.EventResponseDTO "Successfully updated event status"
+// @Failure 400 {object} map[string]interface{} "Bad request"
+// @Failure 404 {object} map[string]interface{} "Event not found"
+// @Failure 500 {object} map[string]interface{} "Internal server error"
+// @Router /event/{id}/status [put]
+func (h *HttpEventHandler) UpdateEventStatus(c *fiber.Ctx) error {
+	id, err := strconv.Atoi(c.Params("id"))
+	if err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"message": "Invalid event ID",
+		})
+	}
+
+	// ตรวจสอบว่า event มีอยู่จริงหรือไม่
+	existingEvent, err := h.eventUseCase.GetEventByID(uint(id))
+	if err != nil {
+		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{
+			"message": "Event not found",
+		})
+	}
+
+	var input dto.EventStatusUpdateDTO
+	if err := c.BodyParser(&input); err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"message": err.Error(),
+		})
+	}
+
+	if input.EventStatusID == 0 {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"message": "event_status_id is required",
+		})
+	}
+
+	// อัพเดทเฉพาะ status
+	existingEvent.EventStatusID = input.EventStatusID
+
+	if err := h.eventUseCase.UpdateEvent(existingEvent); err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"message": err.Error(),
+		})
+	}
+
+	// ถ้า status = 4 สร้าง notification ให้ทุก user
+	if input.EventStatusID == 4 {
+		users, err := h.userUseCase.GetAllUsers() // ใช้ UserUseCase แทน EventUseCase
+		if err != nil {
+			return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+				"message": "Failed to get users: " + err.Error(),
+			})
+		}
+
+		for _, user := range users {
+			notification := entities.Notification{
+				UserID:  user.UserID,
+				EventID: uint(id),
+				Active:  true,
+			}
+			if err := h.notifyUseCase.CreateNotify(&notification); err != nil {
+				// Log error but continue with other users
+				continue
+			}
+		}
+	}
+
+	response := dto.ToEventResponseDTO(existingEvent)
+	return c.Status(fiber.StatusOK).JSON(response)
 }
