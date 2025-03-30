@@ -11,10 +11,15 @@ type EventRepo interface {
 	GetAllEventType() ([]entities.EventType, error)
 	GetAllEventStatus() ([]entities.EventStatus, error)
 	GetAllEventPlan() ([]entities.EventPlan, error)
-	// Create(event *entities.Event) error
-	// GetByID(id int) (*entities.Event, error)
-	// GetAll() ([]entities.Event, error)
-	// Update(event *entities.Event) error
-	// Delete(id int) error
-	// GetCalendarEvents() ([]entities.CalendarResponse, error)
+
+	CreateEvent(event *entities.Event) error
+	GetEventByID(eventID uint) (*entities.Event, error)
+	GetAllEvents() ([]entities.Event, error)
+	UpdateEvent(event *entities.Event) error
+	DeleteEvent(eventID uint) error
+
+	AddSpeakersToEvent(event *entities.Event, speakerIDs []uint) error
+	AddResponsibleUsersToEvent(event *entities.Event, userIDs []string) error
+
+	//GetCalendarEvents() ([]entities.CalendarResponse, error)
 }

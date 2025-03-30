@@ -1,7 +1,11 @@
 package adapters
 
 import (
+	"strconv"
+
 	"github.com/gofiber/fiber/v2"
+	"github.com/songwaad/cs-event-backend/dto"
+	"github.com/songwaad/cs-event-backend/entities"
 	"github.com/songwaad/cs-event-backend/usecases"
 )
 
@@ -93,172 +97,241 @@ func (h *HttpEventHandle) GetAllEventPlan(c *fiber.Ctx) error {
 	return c.Status(fiber.StatusOK).JSON(eventPlans)
 }
 
-// // CreateEvent godoc
-// // @Summary Create a new event
-// // @Description Create a new event with the provided details
-// // @Tags Event
-// // @Accept json
-// // @Produce json
-// // @Security ApiKeyAuth
-// // @Param event body entities.Event true "Event object"
-// // @Success 201 {object} entities.Event
-// // @Failure 400 {object} map[string]interface{}
-// // @Failure 500 {object} map[string]interface{}
-// // @Router /event [post]
-// func (h *HttpEventHandle) CreateEvent(c *fiber.Ctx) error {
-// 	var event entities.Event
-// 	if err := c.BodyParser(&event); err != nil {
-// 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
-// 			"error": "invalid request",
-// 		})
-// 	}
+// CreateEvent godoc
+// @Summary Create a new event
+// @Description Create a new event in the system
+// @Tags Event
+// @Accept json
+// @Produce json
+// @Param event body dto.EventCreateDTO true "Event information"
+// @Success 201 {object} dto.EventResponseDTO "Successfully created event"
+// @Failure 400 {object} map[string]interface{} "Bad request"
+// @Failure 500 {object} map[string]interface{} "Internal server error"
+// @Router /event [post]
+func (h *HttpEventHandle) CreateEvent(c *fiber.Ctx) error {
+	var input dto.EventCreateDTO
+	if err := c.BodyParser(&input); err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"message": err.Error(),
+		})
+	}
 
-// 	if err := h.eventUseCase.CreateEvent(&event); err != nil {
-// 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
-// 			"error": err.Error(),
-// 		})
-// 	}
+	event := entities.Event{
+		Name:              input.Name,
+		Year:              input.Year,
+		Rationale:         input.Rationale,
+		Objective:         input.Objective,
+		StartDate:         input.StartDate,
+		EndDate:           input.EndDate,
+		Location:          input.Location,
+		Methodology:       input.Methodology,
+		HasBudget:         input.HasBudget,
+		Monitoring:        input.Monitoring,
+		EventTypeStatusID: input.EventTypeStatusID,
+		EventPlanID:       input.EventPlanID,
+		EventTypeID:       input.EventTypeID,
+		EventStrategyID:   input.EventStrategyID,
+		CreatedByUserID:   input.CreatedByUserID,
+		EventStatusID:     input.EventStatusID,
+	}
 
-// 	return c.Status(fiber.StatusCreated).JSON(event)
-// }
+	// สร้าง event ใหม่
+	if err := h.eventUseCase.CreateEvent(&event); err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"message": err.Error(),
+		})
+	}
 
-// // GetEventByID godoc
-// // @Summary Get an event by ID
-// // @Description Retrieve an event by its ID
-// // @Tags Event
-// // @Accept json
-// // @Produce json
-// // @Security ApiKeyAuth
-// // @Param id path int true "Event ID"
-// // @Success 200 {object} entities.Event
-// // @Failure 400 {object} map[string]interface{}
-// // @Failure 404 {object} map[string]interface{}
-// // @Router /event/{id} [get]
-// func (h *HttpEventHandle) GetEventByID(c *fiber.Ctx) error {
-// 	id, err := c.ParamsInt("id")
-// 	if err != nil {
-// 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
-// 			"error": "invalid id",
-// 		})
-// 	}
+	// เชื่อมโยง Responsible Users
+	if len(input.ResponsibleUserIDs) > 0 {
+		if err := h.eventUseCase.AddResponsibleUsersToEvent(&event, input.ResponsibleUserIDs); err != nil {
+			return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+				"message": err.Error(),
+			})
+		}
+	}
 
-// 	event, err := h.eventUseCase.GetEventByID(id)
-// 	if err != nil {
-// 		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{
-// 			"error": err.Error(),
-// 		})
-// 	}
+	// เชื่อมโยง Speakers
+	if len(input.SpeakerIDs) > 0 {
+		if err := h.eventUseCase.AddSpeakersToEvent(&event, input.SpeakerIDs); err != nil {
+			return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+				"message": err.Error(),
+			})
+		}
+	}
 
-// 	return c.Status(fiber.StatusOK).JSON(event)
-// }
+	createdEvent, err := h.eventUseCase.GetEventByID(uint(event.EventID))
+	if err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"message": "failed to retrieve created event",
+		})
+	}
 
-// // GetAllEvents godoc
-// // @Summary Get all events
-// // @Description Retrieve a list of all events
-// // @Tags Event
-// // @Accept json
-// // @Produce json
-// // @Security ApiKeyAuth
-// // @Success 200 {array} entities.Event
-// // @Failure 500 {object} map[string]interface{}
-// // @Router /events [get]
-// func (h *HttpEventHandle) GetAllEvents(c *fiber.Ctx) error {
-// 	events, err := h.eventUseCase.GetAllEvents()
-// 	if err != nil {
-// 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
-// 			"error": err.Error(),
-// 		})
-// 	}
+	response := dto.ToEventResponseDTO(createdEvent)
+	return c.Status(fiber.StatusCreated).JSON(fiber.Map{
+		"message": "Event created successfully",
+		"event":   response,
+	})
+}
 
-// 	return c.Status(fiber.StatusOK).JSON(events)
-// }
+// GetEventByID godoc
+// @Summary Get event by ID
+// @Description Retrieve an event by its ID
+// @Tags Event
+// @Accept json
+// @Produce json
+// @Param id path int true "Event ID"
+// @Success 200 {object} dto.EventResponseDTO "Successfully retrieved event"
+// @Failure 404 {object} map[string]interface{} "Event not found"
+// @Failure 500 {object} map[string]interface{} "Internal server error"
+// @Router /event/{id} [get]
+func (h *HttpEventHandle) GetEventByID(c *fiber.Ctx) error {
+	eventID, err := strconv.Atoi(c.Params("id"))
+	if err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"message": "Invalid event ID",
+		})
+	}
 
-// // UpdateEvent godoc
-// // @Summary Update an event
-// // @Description Update an existing event by ID
-// // @Tags Event
-// // @Accept json
-// // @Produce json
-// // @Security ApiKeyAuth
-// // @Param id path int true "Event ID"
-// // @Param event body entities.Event true "Updated event object"
-// // @Success 200 {object} map[string]interface{}
-// // @Failure 400 {object} map[string]interface{}
-// // @Failure 500 {object} map[string]interface{}
-// // @Router /event/{id} [put]
-// func (h *HttpEventHandle) UpdateEvent(c *fiber.Ctx) error {
-// 	id, err := c.ParamsInt("id")
-// 	if err != nil {
-// 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
-// 			"error": "invalid id",
-// 		})
-// 	}
+	event, err := h.eventUseCase.GetEventByID(uint(eventID))
+	if err != nil {
+		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{
+			"message": "Event not found",
+		})
+	}
 
-// 	var event entities.Event
-// 	if err := c.BodyParser(&event); err != nil {
-// 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
-// 			"error": "invalid request",
-// 		})
-// 	}
+	response := dto.ToEventResponseDTO(event)
+	return c.Status(fiber.StatusOK).JSON(response)
+}
 
-// 	event.ID = uint(id)
-// 	if err := h.eventUseCase.UpdateEvent(&event); err != nil {
-// 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
-// 			"error": err.Error(),
-// 		})
-// 	}
+// GetAllEvents godoc
+// @Summary Get all events
+// @Description Retrieve all events from the system
+// @Tags Event
+// @Accept json
+// @Produce json
+// @Success 200 {array} dto.EventResponseDTO "Successfully retrieved all events"
+// @Failure 500 {object} map[string]interface{} "Internal server error"
+// @Router /events [get]
+func (h *HttpEventHandle) GetAllEvents(c *fiber.Ctx) error {
+	events, err := h.eventUseCase.GetAllEvents()
+	if err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"message": err.Error(),
+		})
+	}
 
-// 	return c.Status(fiber.StatusOK).JSON(fiber.Map{
-// 		"message": "Event updated successfully",
-// 		"event":   event,
-// 	})
-// }
+	var responses []dto.EventResponseDTO
 
-// // DeleteEvent godoc
-// // @Summary Delete an event
-// // @Description Delete an event by ID
-// // @Tags Event
-// // @Accept json
-// // @Produce json
-// // @Security ApiKeyAuth
-// // @Param id path int true "Event ID"
-// // @Success 204 {object} nil
-// // @Failure 400 {object} map[string]interface{}
-// // @Failure 500 {object} map[string]interface{}
-// // @Router /event/{id} [delete]
-// func (h *HttpEventHandle) DeleteEvent(c *fiber.Ctx) error {
-// 	id, err := c.ParamsInt("id")
-// 	if err != nil {
-// 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
-// 			"error": "invalid id",
-// 		})
-// 	}
+	for _, event := range events {
+		response := dto.ToEventResponseDTO(&event)
+		responses = append(responses, *response)
+	}
 
-// 	if err := h.eventUseCase.DeleteEvent(id); err != nil {
-// 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
-// 			"error": err.Error(),
-// 		})
-// 	}
+	return c.Status(fiber.StatusOK).JSON(responses)
+}
 
-// 	return c.SendStatus(fiber.StatusNoContent)
-// }
+// UpdateEvent godoc
+// @Summary Update an event
+// @Description Update an existing event in the system
+// @Tags Event
+// @Accept json
+// @Produce json
+// @Param id path int true "Event ID"
+// @Param event body dto.EventCreateDTO true "Updated event information"
+// @Success 200 {object} dto.EventResponseDTO "Successfully updated event"
+// @Failure 400 {object} map[string]interface{} "Bad request"
+// @Failure 404 {object} map[string]interface{} "Event not found"
+// @Failure 500 {object} map[string]interface{} "Internal server error"
+// @Router /event/{id} [put]
+func (h *HttpEventHandle) UpdateEvent(c *fiber.Ctx) error {
+	id, err := strconv.Atoi(c.Params("id"))
+	if err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"message": "Invalid event ID",
+		})
+	}
 
-// // GetCalendar godoc
-// // @Summary Retrieve event calendar
-// // @Description Get all event details, sorted by start date
-// // @Tags Calendar
-// // @Accept json
-// // @Produce json
-// // @Security ApiKeyAuth
-// // @Success 200 {array} entities.CalendarResponse
-// // @Failure 500 {object} map[string]interface{}
-// // @Router /calendar [get]
-// func (h *HttpEventHandle) GetCalendar(c *fiber.Ctx) error {
-// 	events, err := h.eventUseCase.GetCalendarEvents()
-// 	if err != nil {
-// 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
-// 			"error": err.Error(),
-// 		})
-// 	}
-// 	return c.Status(fiber.StatusOK).JSON(events)
-// }
+	// ตรวจสอบว่า event มีอยู่จริงหรือไม่
+	existingEvent, err := h.eventUseCase.GetEventByID(uint(id))
+	if err != nil {
+		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{
+			"message": "Event not found",
+		})
+	}
+
+	// Parse ข้อมูลที่ต้องการอัปเดต
+	var input dto.EventCreateDTO
+	if err := c.BodyParser(&input); err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"message": err.Error(),
+		})
+	}
+
+	// อัปเดตข้อมูล event จาก input
+	existingEvent.Name = input.Name
+	existingEvent.Year = input.Year
+	existingEvent.Rationale = input.Rationale
+	existingEvent.Objective = input.Objective
+	existingEvent.StartDate = input.StartDate
+	existingEvent.EndDate = input.EndDate
+	existingEvent.Location = input.Location
+	existingEvent.Methodology = input.Methodology
+	existingEvent.HasBudget = input.HasBudget
+	existingEvent.Monitoring = input.Monitoring
+	existingEvent.EventTypeStatusID = input.EventTypeStatusID
+	existingEvent.EventPlanID = input.EventPlanID
+	existingEvent.EventTypeID = input.EventTypeID
+	existingEvent.EventStrategyID = input.EventStrategyID
+	existingEvent.EventStatusID = input.EventStatusID
+
+	// บันทึกการอัปเดต
+	if err := h.eventUseCase.UpdateEvent(existingEvent); err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"message": err.Error(),
+		})
+	}
+
+	response := dto.ToEventResponseDTO(existingEvent)
+	return c.Status(fiber.StatusOK).JSON(response)
+}
+
+// DeleteEvent godoc
+// @Summary Delete an event
+// @Description Delete an event from the system
+// @Tags Event
+// @Accept json
+// @Produce json
+// @Param id path int true "Event ID"
+// @Success 200 {object} map[string]interface{} "Successfully deleted event"
+// @Failure 400 {object} map[string]interface{} "Bad request"
+// @Failure 404 {object} map[string]interface{} "Event not found"
+// @Failure 500 {object} map[string]interface{} "Internal server error"
+// @Router /event/{id} [delete]
+func (h *HttpEventHandle) DeleteEvent(c *fiber.Ctx) error {
+	id, err := strconv.Atoi(c.Params("id"))
+	if err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"message": "Invalid event ID",
+		})
+	}
+
+	// ตรวจสอบว่า event มีอยู่จริงหรือไม่
+	_, err = h.eventUseCase.GetEventByID(uint(id))
+	if err != nil {
+		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{
+			"message": "Event not found",
+		})
+	}
+
+	// ลบ event
+	if err := h.eventUseCase.DeleteEvent(uint(id)); err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"message": err.Error(),
+		})
+	}
+
+	return c.Status(fiber.StatusOK).JSON(fiber.Map{
+		"message": "Event deleted successfully",
+	})
+}
