@@ -44,7 +44,7 @@ type UserResponseDTO struct {
 	UserID     string `json:"user_id" gorm:"primaryKey"`
 	Email      string `gorm:"unique"`
 	FirstName  string `json:"first_name"`
-	Lastname   string
+	Lastname   string `json:"last_name"`
 	UserRole   UserRoleDTO
 	UserStatus UserStatusDTO
 }
