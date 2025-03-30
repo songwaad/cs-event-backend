@@ -17,7 +17,7 @@ const docTemplate = `{
     "paths": {
         "/auth/login": {
             "post": {
-                "description": "Authenticate a user and return a JWT token",
+                "description": "Authenticates a user by their email and password, and returns a JWT token upon successful authentication.",
                 "consumes": [
                     "application/json"
                 ],
@@ -27,7 +27,7 @@ const docTemplate = `{
                 "tags": [
                     "User"
                 ],
-                "summary": "Login a user",
+                "summary": "User login",
                 "parameters": [
                     {
                         "description": "Login credentials",
@@ -49,21 +49,21 @@ const docTemplate = `{
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK",
+                        "description": "Login successful with JWT token",
                         "schema": {
                             "type": "object",
                             "additionalProperties": true
                         }
                     },
                     "400": {
-                        "description": "Bad Request",
+                        "description": "Bad request due to invalid credentials",
                         "schema": {
                             "type": "object",
                             "additionalProperties": true
                         }
                     },
                     "500": {
-                        "description": "Internal Server Error",
+                        "description": "Internal server error",
                         "schema": {
                             "type": "object",
                             "additionalProperties": true
@@ -79,7 +79,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
-                "description": "Clear the JWT cookie and log out the user",
+                "description": "Logs out the user by clearing their JWT cookie.",
                 "consumes": [
                     "application/json"
                 ],
@@ -89,10 +89,10 @@ const docTemplate = `{
                 "tags": [
                     "User"
                 ],
-                "summary": "Logout a user",
+                "summary": "User logout",
                 "responses": {
                     "200": {
-                        "description": "OK",
+                        "description": "User logged out successfully",
                         "schema": {
                             "type": "object",
                             "additionalProperties": true
@@ -103,7 +103,7 @@ const docTemplate = `{
         },
         "/auth/register": {
             "post": {
-                "description": "Register a new user with email and password",
+                "description": "Registers a new user by providing an email, password, and optional first and last names, as well as user role ID.",
                 "consumes": [
                     "application/json"
                 ],
@@ -116,31 +116,31 @@ const docTemplate = `{
                 "summary": "Register a new user",
                 "parameters": [
                     {
-                        "description": "User object",
+                        "description": "User registration details",
                         "name": "user",
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/entities.User"
+                            "$ref": "#/definitions/dto.UserRegisterDTO"
                         }
                     }
                 ],
                 "responses": {
                     "201": {
-                        "description": "Created",
+                        "description": "User successfully created",
                         "schema": {
-                            "$ref": "#/definitions/entities.User"
+                            "$ref": "#/definitions/dto.UserRegisterDTO"
                         }
                     },
                     "400": {
-                        "description": "Bad Request",
+                        "description": "Bad request due to invalid or missing input",
                         "schema": {
                             "type": "object",
                             "additionalProperties": true
                         }
                     },
                     "500": {
-                        "description": "Internal Server Error",
+                        "description": "Internal server error",
                         "schema": {
                             "type": "object",
                             "additionalProperties": true
@@ -149,68 +149,14 @@ const docTemplate = `{
                 }
             }
         },
-        "/budget": {
-            "post": {
-                "security": [
-                    {
-                        "ApiKeyAuth": []
-                    }
-                ],
-                "description": "Create a new Budget with the provided details",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Budget"
-                ],
-                "summary": "Create a new Budget",
-                "parameters": [
-                    {
-                        "description": "Budget object",
-                        "name": "Budget",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/entities.Budget"
-                        }
-                    }
-                ],
-                "responses": {
-                    "201": {
-                        "description": "Created",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    }
-                }
-            }
-        },
-        "/budget/{id}": {
+        "/event-strategies": {
             "get": {
                 "security": [
                     {
                         "ApiKeyAuth": []
                     }
                 ],
-                "description": "Retrieve an Budget by ID",
+                "description": "Retrieve a list of all event strategies",
                 "consumes": [
                     "application/json"
                 ],
@@ -218,13 +164,51 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Budget"
+                    "Event Strategy"
                 ],
-                "summary": "Get an Budget by ID",
+                "summary": "Get all event strategies",
+                "responses": {
+                    "200": {
+                        "description": "List of all event strategies",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/dto.EventStrategyResponseDTO"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            }
+        },
+        "/event-strategy/{id}": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Retrieve an event strategy by its unique ID",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Event Strategy"
+                ],
+                "summary": "Get an event strategy by ID",
                 "parameters": [
                     {
                         "type": "integer",
-                        "description": "Budget ID",
+                        "description": "Event Strategy ID",
                         "name": "id",
                         "in": "path",
                         "required": true
@@ -232,20 +216,60 @@ const docTemplate = `{
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK",
+                        "description": "Successfully retrieved event strategy",
                         "schema": {
-                            "$ref": "#/definitions/entities.Budget"
+                            "$ref": "#/definitions/dto.EventStrategyResponseDTO"
                         }
                     },
                     "400": {
-                        "description": "Bad Request",
+                        "description": "Invalid ID format",
                         "schema": {
                             "type": "object",
                             "additionalProperties": true
                         }
                     },
                     "404": {
-                        "description": "Not Found",
+                        "description": "Event strategy not found",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            }
+        },
+        "/events": {
+            "get": {
+                "description": "Retrieve all events from the system",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Event"
+                ],
+                "summary": "Get all events",
+                "responses": {
+                    "200": {
+                        "description": "Successfully retrieved all events",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/dto.EventResponseDTO"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
                         "schema": {
                             "type": "object",
                             "additionalProperties": true
@@ -253,198 +277,8 @@ const docTemplate = `{
                     }
                 }
             },
-            "delete": {
-                "security": [
-                    {
-                        "ApiKeyAuth": []
-                    }
-                ],
-                "description": "Delete an Budget by ID",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Budget"
-                ],
-                "summary": "Delete an Budget",
-                "parameters": [
-                    {
-                        "type": "integer",
-                        "description": "Budget ID",
-                        "name": "id",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "204": {
-                        "description": "No Content"
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    }
-                }
-            }
-        },
-        "/budgets": {
-            "get": {
-                "security": [
-                    {
-                        "ApiKeyAuth": []
-                    }
-                ],
-                "description": "Retrieve a list of all Budget",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Budget"
-                ],
-                "summary": "Get all Budget",
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "#/definitions/entities.Budget"
-                            }
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    }
-                }
-            }
-        },
-        "/budgets/{id}": {
-            "put": {
-                "security": [
-                    {
-                        "ApiKeyAuth": []
-                    }
-                ],
-                "description": "Update an existing Budget by ID",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Budget"
-                ],
-                "summary": "Update an instructor",
-                "parameters": [
-                    {
-                        "type": "integer",
-                        "description": "Budget ID",
-                        "name": "id",
-                        "in": "path",
-                        "required": true
-                    },
-                    {
-                        "description": "Updated instructor object",
-                        "name": "Budget",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/entities.Budget"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    }
-                }
-            }
-        },
-        "/calendar": {
-            "get": {
-                "security": [
-                    {
-                        "ApiKeyAuth": []
-                    }
-                ],
-                "description": "Get all event details, sorted by start date",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Calendar"
-                ],
-                "summary": "Retrieve event calendar",
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "#/definitions/entities.CalendarResponse"
-                            }
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    }
-                }
-            }
-        },
-        "/event": {
             "post": {
-                "security": [
-                    {
-                        "ApiKeyAuth": []
-                    }
-                ],
-                "description": "Create a new event with the provided details",
+                "description": "Create a new event in the system",
                 "consumes": [
                     "application/json"
                 ],
@@ -457,31 +291,31 @@ const docTemplate = `{
                 "summary": "Create a new event",
                 "parameters": [
                     {
-                        "description": "Event object",
+                        "description": "Event information",
                         "name": "event",
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/entities.Event"
+                            "$ref": "#/definitions/dto.EventCreateDTO"
                         }
                     }
                 ],
                 "responses": {
                     "201": {
-                        "description": "Created",
+                        "description": "Successfully created event",
                         "schema": {
-                            "$ref": "#/definitions/entities.Event"
+                            "$ref": "#/definitions/dto.EventResponseDTO"
                         }
                     },
                     "400": {
-                        "description": "Bad Request",
+                        "description": "Bad request",
                         "schema": {
                             "type": "object",
                             "additionalProperties": true
                         }
                     },
                     "500": {
-                        "description": "Internal Server Error",
+                        "description": "Internal server error",
                         "schema": {
                             "type": "object",
                             "additionalProperties": true
@@ -490,13 +324,140 @@ const docTemplate = `{
                 }
             }
         },
-        "/event/{id}": {
+        "/events/plans": {
             "get": {
-                "security": [
-                    {
-                        "ApiKeyAuth": []
-                    }
+                "description": "Retrieve all event plans from the system",
+                "consumes": [
+                    "application/json"
                 ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Event"
+                ],
+                "summary": "Get all event plans",
+                "responses": {
+                    "200": {
+                        "description": "Successfully retrieved all event plans",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/entities.EventPlan"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            }
+        },
+        "/events/status": {
+            "get": {
+                "description": "Retrieve all event status from the system",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Event"
+                ],
+                "summary": "Get all event status",
+                "responses": {
+                    "200": {
+                        "description": "Successfully retrieved all event status",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/entities.EventStatus"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            }
+        },
+        "/events/types": {
+            "get": {
+                "description": "Retrieve all event types from the system",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Event"
+                ],
+                "summary": "Get all event types",
+                "responses": {
+                    "200": {
+                        "description": "Successfully retrieved all event types",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/entities.EventType"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            }
+        },
+        "/events/types/status": {
+            "get": {
+                "description": "Retrieve all event type status from the system",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Event"
+                ],
+                "summary": "Get all event type status",
+                "responses": {
+                    "200": {
+                        "description": "Successfully retrieved all event type status",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/entities.EventTypeStatus"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            }
+        },
+        "/events/{id}": {
+            "get": {
                 "description": "Retrieve an event by its ID",
                 "consumes": [
                     "application/json"
@@ -507,7 +468,7 @@ const docTemplate = `{
                 "tags": [
                     "Event"
                 ],
-                "summary": "Get an event by ID",
+                "summary": "Get event by ID",
                 "parameters": [
                     {
                         "type": "integer",
@@ -519,20 +480,20 @@ const docTemplate = `{
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK",
+                        "description": "Successfully retrieved event",
                         "schema": {
-                            "$ref": "#/definitions/entities.Event"
+                            "$ref": "#/definitions/dto.EventResponseDTO"
                         }
                     },
-                    "400": {
-                        "description": "Bad Request",
+                    "404": {
+                        "description": "Event not found",
                         "schema": {
                             "type": "object",
                             "additionalProperties": true
                         }
                     },
-                    "404": {
-                        "description": "Not Found",
+                    "500": {
+                        "description": "Internal server error",
                         "schema": {
                             "type": "object",
                             "additionalProperties": true
@@ -541,12 +502,7 @@ const docTemplate = `{
                 }
             },
             "put": {
-                "security": [
-                    {
-                        "ApiKeyAuth": []
-                    }
-                ],
-                "description": "Update an existing event by ID",
+                "description": "Update an existing event in the system",
                 "consumes": [
                     "application/json"
                 ],
@@ -566,32 +522,38 @@ const docTemplate = `{
                         "required": true
                     },
                     {
-                        "description": "Updated event object",
+                        "description": "Updated event information",
                         "name": "event",
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/entities.Event"
+                            "$ref": "#/definitions/dto.EventCreateDTO"
                         }
                     }
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK",
+                        "description": "Successfully updated event",
+                        "schema": {
+                            "$ref": "#/definitions/dto.EventResponseDTO"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request",
                         "schema": {
                             "type": "object",
                             "additionalProperties": true
                         }
                     },
-                    "400": {
-                        "description": "Bad Request",
+                    "404": {
+                        "description": "Event not found",
                         "schema": {
                             "type": "object",
                             "additionalProperties": true
                         }
                     },
                     "500": {
-                        "description": "Internal Server Error",
+                        "description": "Internal server error",
                         "schema": {
                             "type": "object",
                             "additionalProperties": true
@@ -600,12 +562,7 @@ const docTemplate = `{
                 }
             },
             "delete": {
-                "security": [
-                    {
-                        "ApiKeyAuth": []
-                    }
-                ],
-                "description": "Delete an event by ID",
+                "description": "Delete an event from the system",
                 "consumes": [
                     "application/json"
                 ],
@@ -626,18 +583,29 @@ const docTemplate = `{
                     }
                 ],
                 "responses": {
-                    "204": {
-                        "description": "No Content"
+                    "200": {
+                        "description": "Successfully deleted event",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
                     },
                     "400": {
-                        "description": "Bad Request",
+                        "description": "Bad request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "404": {
+                        "description": "Event not found",
                         "schema": {
                             "type": "object",
                             "additionalProperties": true
                         }
                     },
                     "500": {
-                        "description": "Internal Server Error",
+                        "description": "Internal server error",
                         "schema": {
                             "type": "object",
                             "additionalProperties": true
@@ -646,52 +614,14 @@ const docTemplate = `{
                 }
             }
         },
-        "/events": {
-            "get": {
-                "security": [
-                    {
-                        "ApiKeyAuth": []
-                    }
-                ],
-                "description": "Retrieve a list of all events",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Event"
-                ],
-                "summary": "Get all events",
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "#/definitions/entities.Event"
-                            }
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    }
-                }
-            }
-        },
-        "/instructor": {
+        "/speaker": {
             "post": {
                 "security": [
                     {
                         "ApiKeyAuth": []
                     }
                 ],
-                "description": "Create a new instructor with the provided details",
+                "description": "Creates a new speaker by providing the speaker's first name, last name, and description",
                 "consumes": [
                     "application/json"
                 ],
@@ -699,37 +629,37 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Instructor"
+                    "Speaker"
                 ],
-                "summary": "Create a new instructor",
+                "summary": "Create a new Speaker",
                 "parameters": [
                     {
-                        "description": "Instructor object",
-                        "name": "instructor",
+                        "description": "Speaker details",
+                        "name": "speaker",
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/entities.Instructor"
+                            "$ref": "#/definitions/dto.SpeakerDTO"
                         }
                     }
                 ],
                 "responses": {
                     "201": {
-                        "description": "Created",
+                        "description": "Speaker created successfully",
                         "schema": {
                             "type": "object",
                             "additionalProperties": true
                         }
                     },
                     "400": {
-                        "description": "Bad Request",
+                        "description": "Invalid input",
                         "schema": {
                             "type": "object",
                             "additionalProperties": true
                         }
                     },
                     "500": {
-                        "description": "Internal Server Error",
+                        "description": "Internal server error",
                         "schema": {
                             "type": "object",
                             "additionalProperties": true
@@ -738,14 +668,14 @@ const docTemplate = `{
                 }
             }
         },
-        "/instructor/{id}": {
+        "/speaker/{id}": {
             "get": {
                 "security": [
                     {
                         "ApiKeyAuth": []
                     }
                 ],
-                "description": "Retrieve an instructor by its ID",
+                "description": "Retrieve a speaker's details by their unique speaker ID",
                 "consumes": [
                     "application/json"
                 ],
@@ -753,13 +683,13 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Instructor"
+                    "Speaker"
                 ],
-                "summary": "Get an instructor by ID",
+                "summary": "Get a Speaker by ID",
                 "parameters": [
                     {
                         "type": "integer",
-                        "description": "Instructor ID",
+                        "description": "Speaker ID",
                         "name": "id",
                         "in": "path",
                         "required": true
@@ -767,20 +697,20 @@ const docTemplate = `{
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK",
+                        "description": "Speaker details retrieved successfully",
                         "schema": {
-                            "$ref": "#/definitions/entities.Instructor"
+                            "$ref": "#/definitions/dto.SpeakerDTO"
                         }
                     },
                     "400": {
-                        "description": "Bad Request",
+                        "description": "Invalid ID format",
                         "schema": {
                             "type": "object",
                             "additionalProperties": true
                         }
                     },
                     "404": {
-                        "description": "Not Found",
+                        "description": "Speaker not found",
                         "schema": {
                             "type": "object",
                             "additionalProperties": true
@@ -794,7 +724,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
-                "description": "Update an existing instructor by ID",
+                "description": "Update a speaker's details (first name, last name, description) by their unique speaker ID",
                 "consumes": [
                     "application/json"
                 ],
@@ -802,44 +732,44 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Instructor"
+                    "Speaker"
                 ],
-                "summary": "Update an instructor",
+                "summary": "Update an existing Speaker",
                 "parameters": [
                     {
                         "type": "integer",
-                        "description": "Instructor ID",
+                        "description": "Speaker ID",
                         "name": "id",
                         "in": "path",
                         "required": true
                     },
                     {
-                        "description": "Updated instructor object",
-                        "name": "instructor",
+                        "description": "Updated speaker details",
+                        "name": "speaker",
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/entities.Instructor"
+                            "$ref": "#/definitions/dto.SpeakerDTO"
                         }
                     }
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK",
+                        "description": "Speaker updated successfully",
                         "schema": {
                             "type": "object",
                             "additionalProperties": true
                         }
                     },
                     "400": {
-                        "description": "Bad Request",
+                        "description": "Invalid input or speaker ID",
                         "schema": {
                             "type": "object",
                             "additionalProperties": true
                         }
                     },
                     "500": {
-                        "description": "Internal Server Error",
+                        "description": "Internal server error",
                         "schema": {
                             "type": "object",
                             "additionalProperties": true
@@ -853,7 +783,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
-                "description": "Delete an instructor by ID",
+                "description": "Delete a speaker by their unique speaker ID",
                 "consumes": [
                     "application/json"
                 ],
@@ -861,13 +791,13 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Instructor"
+                    "Speaker"
                 ],
-                "summary": "Delete an instructor",
+                "summary": "Delete a speaker",
                 "parameters": [
                     {
                         "type": "integer",
-                        "description": "Instructor ID",
+                        "description": "Speaker ID",
                         "name": "id",
                         "in": "path",
                         "required": true
@@ -875,17 +805,17 @@ const docTemplate = `{
                 ],
                 "responses": {
                     "204": {
-                        "description": "No Content"
+                        "description": "Speaker deleted successfully"
                     },
                     "400": {
-                        "description": "Bad Request",
+                        "description": "Invalid speaker ID",
                         "schema": {
                             "type": "object",
                             "additionalProperties": true
                         }
                     },
                     "500": {
-                        "description": "Internal Server Error",
+                        "description": "Internal server error",
                         "schema": {
                             "type": "object",
                             "additionalProperties": true
@@ -894,14 +824,14 @@ const docTemplate = `{
                 }
             }
         },
-        "/instructors": {
+        "/speakers": {
             "get": {
                 "security": [
                     {
                         "ApiKeyAuth": []
                     }
                 ],
-                "description": "Retrieve a list of all instructors",
+                "description": "Retrieve a list of all speakers",
                 "consumes": [
                     "application/json"
                 ],
@@ -909,21 +839,21 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Instructor"
+                    "Speaker"
                 ],
-                "summary": "Get all instructors",
+                "summary": "Get all Speakers",
                 "responses": {
                     "200": {
-                        "description": "OK",
+                        "description": "List of all speakers",
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/entities.Instructor"
+                                "$ref": "#/definitions/dto.SpeakerDTO"
                             }
                         }
                     },
                     "500": {
-                        "description": "Internal Server Error",
+                        "description": "Internal server error",
                         "schema": {
                             "type": "object",
                             "additionalProperties": true
@@ -932,14 +862,14 @@ const docTemplate = `{
                 }
             }
         },
-        "/notifications/user/{id}": {
+        "/strategies": {
             "get": {
                 "security": [
                     {
                         "ApiKeyAuth": []
                     }
                 ],
-                "description": "Retrieve all notifications for a specific user by their ID",
+                "description": "Retrieve a list of all strategies",
                 "consumes": [
                     "application/json"
                 ],
@@ -947,13 +877,51 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Notification"
+                    "Strategy"
                 ],
-                "summary": "Get notifications by user ID",
+                "summary": "Get all strategies",
+                "responses": {
+                    "200": {
+                        "description": "List of all strategies",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/dto.StrategyResponseDTO"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            }
+        },
+        "/strategy/{id}": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Retrieve a strategy by its unique ID from the database",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Strategy"
+                ],
+                "summary": "Get a strategy by ID",
                 "parameters": [
                     {
-                        "type": "string",
-                        "description": "User ID",
+                        "type": "integer",
+                        "description": "Strategy ID",
                         "name": "id",
                         "in": "path",
                         "required": true
@@ -961,116 +929,27 @@ const docTemplate = `{
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK",
+                        "description": "Successfully retrieved strategy",
                         "schema": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "#/definitions/entities.Notification"
-                            }
+                            "$ref": "#/definitions/dto.StrategyResponseDTO"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid ID format",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
                         }
                     },
                     "404": {
-                        "description": "Not Found",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    }
-                }
-            }
-        },
-        "/notifications/{id}": {
-            "delete": {
-                "security": [
-                    {
-                        "ApiKeyAuth": []
-                    }
-                ],
-                "description": "Delete a notification by its ID",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Notification"
-                ],
-                "summary": "Delete a notification",
-                "parameters": [
-                    {
-                        "type": "integer",
-                        "description": "Notification ID",
-                        "name": "id",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "204": {
-                        "description": "No Content"
-                    },
-                    "400": {
-                        "description": "Bad Request",
+                        "description": "Strategy not found",
                         "schema": {
                             "type": "object",
                             "additionalProperties": true
                         }
                     },
                     "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    }
-                }
-            }
-        },
-        "/notifications/{id}/inactive": {
-            "patch": {
-                "security": [
-                    {
-                        "ApiKeyAuth": []
-                    }
-                ],
-                "description": "Deactivate a notification by setting its active status to false",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Notification"
-                ],
-                "summary": "Deactivate a notification",
-                "parameters": [
-                    {
-                        "type": "integer",
-                        "description": "Notification ID",
-                        "name": "id",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
+                        "description": "Internal server error",
                         "schema": {
                             "type": "object",
                             "additionalProperties": true
@@ -1086,7 +965,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
-                "description": "Retrieve a user by its ID",
+                "description": "Fetches the user details based on their unique user ID.",
                 "consumes": [
                     "application/json"
                 ],
@@ -1096,7 +975,7 @@ const docTemplate = `{
                 "tags": [
                     "User"
                 ],
-                "summary": "Get a user by ID",
+                "summary": "Retrieve a user by ID",
                 "parameters": [
                     {
                         "type": "string",
@@ -1108,72 +987,13 @@ const docTemplate = `{
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK",
+                        "description": "User details retrieved successfully",
                         "schema": {
-                            "$ref": "#/definitions/entities.User"
+                            "$ref": "#/definitions/dto.UserResponseDTO"
                         }
                     },
                     "404": {
-                        "description": "Not Found",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    }
-                }
-            },
-            "put": {
-                "security": [
-                    {
-                        "ApiKeyAuth": []
-                    }
-                ],
-                "description": "Update an existing user by ID",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "User"
-                ],
-                "summary": "Update a user",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "User ID",
-                        "name": "id",
-                        "in": "path",
-                        "required": true
-                    },
-                    {
-                        "description": "Updated user object",
-                        "name": "user",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/entities.User"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
+                        "description": "User not found",
                         "schema": {
                             "type": "object",
                             "additionalProperties": true
@@ -1187,7 +1007,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
-                "description": "Delete a user by ID",
+                "description": "Deletes a user from the system using their unique ID.",
                 "consumes": [
                     "application/json"
                 ],
@@ -1209,10 +1029,191 @@ const docTemplate = `{
                 ],
                 "responses": {
                     "204": {
-                        "description": "No Content"
+                        "description": "User successfully deleted"
                     },
                     "500": {
-                        "description": "Internal Server Error",
+                        "description": "Internal server error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            }
+        },
+        "/user/{id}/change-password": {
+            "put": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Allows a user to change their password after verifying the old password.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "User"
+                ],
+                "summary": "Change user password",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "User ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Old and new password",
+                        "name": "password",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.UserChangePasswordDTO"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Password successfully changed",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request due to invalid input",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            }
+        },
+        "/user/{id}/role": {
+            "put": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Updates the role of a user by their unique ID.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "User"
+                ],
+                "summary": "Update user role",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "User ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "New user role",
+                        "name": "role",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.UserUpdateUserRoleDTO"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "User role updated successfully",
+                        "schema": {
+                            "$ref": "#/definitions/dto.UserResponseDTO"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request due to invalid input",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            }
+        },
+        "/user/{id}/status": {
+            "put": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Changes the user status (e.g., active, inactive) based on their ID.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "User"
+                ],
+                "summary": "Update user status",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "User ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "New user status",
+                        "name": "status",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.UserUpdateUserStatusDTO"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "User status updated successfully",
+                        "schema": {
+                            "$ref": "#/definitions/dto.UserResponseDTO"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request due to invalid input",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
                         "schema": {
                             "type": "object",
                             "additionalProperties": true
@@ -1228,7 +1229,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
-                "description": "Retrieve a list of all users",
+                "description": "Fetches a list of all registered users with their details.",
                 "consumes": [
                     "application/json"
                 ],
@@ -1238,19 +1239,19 @@ const docTemplate = `{
                 "tags": [
                     "User"
                 ],
-                "summary": "Get all users",
+                "summary": "Retrieve a list of all users",
                 "responses": {
                     "200": {
-                        "description": "OK",
+                        "description": "List of users retrieved successfully",
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/entities.User"
+                                "$ref": "#/definitions/dto.UserResponseDTO"
                             }
                         }
                     },
                     "500": {
-                        "description": "Internal Server Error",
+                        "description": "Internal server error",
                         "schema": {
                             "type": "object",
                             "additionalProperties": true
@@ -1261,137 +1262,33 @@ const docTemplate = `{
         }
     },
     "definitions": {
-        "entities.Budget": {
+        "dto.EventCreateDTO": {
             "type": "object",
             "properties": {
-                "amount": {
-                    "type": "number"
-                },
-                "description": {
-                    "type": "string"
-                },
-                "eventDetails": {
-                    "$ref": "#/definitions/entities.EventDetails"
-                },
-                "eventDetailsID": {
-                    "type": "integer"
-                },
-                "id": {
-                    "type": "integer"
-                }
-            }
-        },
-        "entities.CalendarResponse": {
-            "type": "object",
-            "properties": {
-                "endDate": {
-                    "type": "string"
-                },
-                "eventType": {
-                    "type": "string"
-                },
-                "id": {
-                    "type": "integer"
-                },
-                "location": {
-                    "type": "string"
-                },
-                "name": {
-                    "type": "string"
-                },
-                "startDate": {
-                    "type": "string"
-                }
-            }
-        },
-        "entities.Event": {
-            "type": "object",
-            "properties": {
-                "created_at": {
-                    "type": "string"
-                },
-                "created_by": {
-                    "type": "string"
-                },
-                "deletedAt": {
-                    "type": "string"
-                },
-                "eventDetails": {
-                    "$ref": "#/definitions/entities.EventDetails"
-                },
-                "eventDetailsID": {
-                    "type": "integer"
-                },
-                "eventStatus": {
-                    "$ref": "#/definitions/entities.EventStatus"
-                },
-                "eventStatusID": {
-                    "type": "integer"
-                },
-                "id": {
-                    "type": "integer"
-                },
-                "updated_at": {
-                    "type": "string"
-                },
-                "user": {
-                    "$ref": "#/definitions/entities.User"
-                },
-                "year": {
-                    "type": "integer"
-                }
-            }
-        },
-        "entities.EventDetails": {
-            "type": "object",
-            "properties": {
-                "deleteAt": {
+                "created_by_user_id": {
                     "type": "string"
                 },
                 "end_date": {
                     "type": "string"
                 },
-                "eventPlane": {
-                    "$ref": "#/definitions/entities.EventPlane"
-                },
-                "eventPlaneID": {
+                "event_plan_id": {
                     "type": "integer"
                 },
-                "eventResult": {
-                    "$ref": "#/definitions/entities.EventResult"
-                },
-                "eventResultID": {
+                "event_status_id": {
                     "type": "integer"
                 },
-                "eventStrategy": {
-                    "$ref": "#/definitions/entities.EventStrategy"
-                },
-                "eventStrategyID": {
+                "event_strategy_id": {
                     "type": "integer"
                 },
-                "eventType": {
-                    "$ref": "#/definitions/entities.EventType"
-                },
-                "eventTypeID": {
+                "event_type_id": {
                     "type": "integer"
                 },
-                "eventTypeStatus": {
-                    "$ref": "#/definitions/entities.EventTypeStatus"
-                },
-                "eventTypeStatusID": {
+                "event_type_status_id": {
+                    "description": "Foreign key",
                     "type": "integer"
                 },
                 "has_budget": {
                     "type": "boolean"
-                },
-                "id": {
-                    "type": "integer"
-                },
-                "instructor": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/entities.Instructor"
-                    }
                 },
                 "location": {
                     "type": "string"
@@ -1411,21 +1308,284 @@ const docTemplate = `{
                 "rationale": {
                     "type": "string"
                 },
-                "responsibleUsers": {
+                "responsible_user_ids": {
+                    "description": "Many-to-many relationships",
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/entities.User"
+                        "type": "string"
+                    }
+                },
+                "speaker_ids": {
+                    "type": "array",
+                    "items": {
+                        "type": "integer"
                     }
                 },
                 "start_date": {
                     "type": "string"
+                },
+                "year": {
+                    "type": "integer"
                 }
             }
         },
-        "entities.EventPlane": {
+        "dto.EventResponseDTO": {
             "type": "object",
             "properties": {
-                "id": {
+                "created_by_user_id": {
+                    "type": "string"
+                },
+                "end_date": {
+                    "type": "string"
+                },
+                "event_id": {
+                    "type": "integer"
+                },
+                "event_plan_id": {
+                    "type": "integer"
+                },
+                "event_status_id": {
+                    "type": "integer"
+                },
+                "event_strategy_id": {
+                    "type": "integer"
+                },
+                "event_type_id": {
+                    "type": "integer"
+                },
+                "event_type_status_id": {
+                    "description": "Foreign key",
+                    "type": "integer"
+                },
+                "firstName": {
+                    "type": "string"
+                },
+                "goal": {
+                    "type": "string"
+                },
+                "has_budget": {
+                    "type": "boolean"
+                },
+                "lastname": {
+                    "type": "string"
+                },
+                "location": {
+                    "type": "string"
+                },
+                "methodology": {
+                    "type": "string"
+                },
+                "monitoring": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "objective": {
+                    "type": "string"
+                },
+                "plan": {
+                    "type": "string"
+                },
+                "rationale": {
+                    "type": "string"
+                },
+                "responsible_users": {
+                    "description": "Many-to-many relationships",
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/dto.UserResponseDTO"
+                    }
+                },
+                "speakers": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/dto.SpeakerDTO"
+                    }
+                },
+                "start_date": {
+                    "type": "string"
+                },
+                "status": {
+                    "type": "string"
+                },
+                "strategy": {
+                    "type": "string"
+                },
+                "tactic": {
+                    "type": "string"
+                },
+                "type": {
+                    "type": "string"
+                },
+                "typeStatus": {
+                    "type": "string"
+                },
+                "workPlan": {
+                    "type": "string"
+                },
+                "year": {
+                    "type": "integer"
+                }
+            }
+        },
+        "dto.EventStrategyResponseDTO": {
+            "type": "object",
+            "properties": {
+                "event_strategy_id": {
+                    "type": "integer"
+                },
+                "goal": {
+                    "type": "string"
+                },
+                "strategy": {
+                    "type": "string"
+                },
+                "tactic": {
+                    "type": "string"
+                }
+            }
+        },
+        "dto.SpeakerDTO": {
+            "type": "object",
+            "properties": {
+                "description": {
+                    "type": "string"
+                },
+                "firstname": {
+                    "type": "string"
+                },
+                "lastname": {
+                    "type": "string"
+                },
+                "speaker_id": {
+                    "type": "integer"
+                }
+            }
+        },
+        "dto.StrategyResponseDTO": {
+            "type": "object",
+            "properties": {
+                "strategy": {
+                    "type": "string"
+                },
+                "strategy_id": {
+                    "type": "integer"
+                }
+            }
+        },
+        "dto.UserChangePasswordDTO": {
+            "type": "object",
+            "properties": {
+                "new_password": {
+                    "type": "string"
+                },
+                "old_password": {
+                    "type": "string"
+                }
+            }
+        },
+        "dto.UserRegisterDTO": {
+            "type": "object",
+            "properties": {
+                "created_at": {
+                    "type": "string"
+                },
+                "deleted_at": {
+                    "type": "string"
+                },
+                "email": {
+                    "type": "string"
+                },
+                "first_name": {
+                    "type": "string"
+                },
+                "lastname": {
+                    "type": "string"
+                },
+                "password": {
+                    "type": "string"
+                },
+                "updated_at": {
+                    "type": "string"
+                },
+                "user_id": {
+                    "type": "string"
+                },
+                "user_role_id": {
+                    "description": "Foreign key",
+                    "type": "integer"
+                },
+                "user_status_id": {
+                    "type": "integer"
+                }
+            }
+        },
+        "dto.UserResponseDTO": {
+            "type": "object",
+            "properties": {
+                "email": {
+                    "type": "string"
+                },
+                "first_name": {
+                    "type": "string"
+                },
+                "last_name": {
+                    "type": "string"
+                },
+                "userRole": {
+                    "$ref": "#/definitions/dto.UserRoleDTO"
+                },
+                "userStatus": {
+                    "$ref": "#/definitions/dto.UserStatusDTO"
+                },
+                "user_id": {
+                    "type": "string"
+                }
+            }
+        },
+        "dto.UserRoleDTO": {
+            "type": "object",
+            "properties": {
+                "role": {
+                    "type": "string"
+                },
+                "user_role_id": {
+                    "type": "integer"
+                }
+            }
+        },
+        "dto.UserStatusDTO": {
+            "type": "object",
+            "properties": {
+                "status": {
+                    "type": "string"
+                },
+                "user_status_id": {
+                    "type": "integer"
+                }
+            }
+        },
+        "dto.UserUpdateUserRoleDTO": {
+            "type": "object",
+            "properties": {
+                "user_role_id": {
+                    "type": "integer"
+                }
+            }
+        },
+        "dto.UserUpdateUserStatusDTO": {
+            "type": "object",
+            "properties": {
+                "user_status_id": {
+                    "type": "integer"
+                }
+            }
+        },
+        "entities.EventPlan": {
+            "type": "object",
+            "properties": {
+                "event_plan_id": {
                     "type": "integer"
                 },
                 "work": {
@@ -1436,39 +1596,10 @@ const docTemplate = `{
                 }
             }
         },
-        "entities.EventResult": {
-            "type": "object",
-            "properties": {
-                "deletedAt": {
-                    "type": "string"
-                },
-                "id": {
-                    "type": "integer"
-                },
-                "product": {
-                    "type": "string"
-                },
-                "productIndicators": {
-                    "type": "string"
-                },
-                "productTarget": {
-                    "type": "string"
-                },
-                "result": {
-                    "type": "string"
-                },
-                "resultIndicators": {
-                    "type": "string"
-                },
-                "resultTarget": {
-                    "type": "string"
-                }
-            }
-        },
         "entities.EventStatus": {
             "type": "object",
             "properties": {
-                "id": {
+                "event_status_id": {
                     "type": "integer"
                 },
                 "status": {
@@ -1476,30 +1607,10 @@ const docTemplate = `{
                 }
             }
         },
-        "entities.EventStrategy": {
-            "type": "object",
-            "properties": {
-                "goal": {
-                    "type": "string"
-                },
-                "id": {
-                    "type": "integer"
-                },
-                "strategy": {
-                    "$ref": "#/definitions/entities.Strategy"
-                },
-                "strategyID": {
-                    "type": "integer"
-                },
-                "tactic": {
-                    "type": "string"
-                }
-            }
-        },
         "entities.EventType": {
             "type": "object",
             "properties": {
-                "id": {
+                "event_type_id": {
                     "type": "integer"
                 },
                 "type": {
@@ -1510,145 +1621,7 @@ const docTemplate = `{
         "entities.EventTypeStatus": {
             "type": "object",
             "properties": {
-                "id": {
-                    "type": "integer"
-                },
-                "status": {
-                    "type": "string"
-                }
-            }
-        },
-        "entities.Instructor": {
-            "type": "object",
-            "properties": {
-                "created_at": {
-                    "type": "string"
-                },
-                "deleteAt": {
-                    "type": "string"
-                },
-                "description": {
-                    "type": "string"
-                },
-                "eventDetails": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/entities.EventDetails"
-                    }
-                },
-                "firstname": {
-                    "type": "string"
-                },
-                "id": {
-                    "type": "integer"
-                },
-                "lastname": {
-                    "type": "string"
-                },
-                "updated_at": {
-                    "type": "string"
-                }
-            }
-        },
-        "entities.Notification": {
-            "type": "object",
-            "properties": {
-                "active": {
-                    "type": "boolean"
-                },
-                "eventDetails": {
-                    "$ref": "#/definitions/entities.EventDetails"
-                },
-                "eventDetailsID": {
-                    "type": "integer"
-                },
-                "id": {
-                    "type": "integer"
-                },
-                "user": {
-                    "$ref": "#/definitions/entities.User"
-                },
-                "userId": {
-                    "type": "string"
-                }
-            }
-        },
-        "entities.Strategy": {
-            "type": "object",
-            "properties": {
-                "id": {
-                    "type": "integer"
-                },
-                "strategy": {
-                    "type": "string"
-                }
-            }
-        },
-        "entities.User": {
-            "type": "object",
-            "properties": {
-                "createdAt": {
-                    "type": "string"
-                },
-                "deleteAt": {
-                    "type": "string"
-                },
-                "email": {
-                    "type": "string"
-                },
-                "eventDetails": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/entities.EventDetails"
-                    }
-                },
-                "firstName": {
-                    "type": "string"
-                },
-                "id": {
-                    "type": "string"
-                },
-                "lastname": {
-                    "type": "string"
-                },
-                "password": {
-                    "type": "string"
-                },
-                "status": {
-                    "type": "string"
-                },
-                "updatedAt": {
-                    "type": "string"
-                },
-                "userRole": {
-                    "$ref": "#/definitions/entities.UserRole"
-                },
-                "userRoleID": {
-                    "type": "integer"
-                },
-                "userStatus": {
-                    "$ref": "#/definitions/entities.UserStatus"
-                },
-                "userStatusID": {
-                    "type": "integer"
-                }
-            }
-        },
-        "entities.UserRole": {
-            "type": "object",
-            "properties": {
-                "id": {
-                    "type": "integer"
-                },
-                "role": {
-                    "type": "string"
-                }
-            }
-        },
-        "entities.UserStatus": {
-            "type": "object",
-            "properties": {
-                "id": {
+                "event_type_status_id": {
                     "type": "integer"
                 },
                 "status": {

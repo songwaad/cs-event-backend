@@ -1,92 +1,24 @@
 basePath: /
 definitions:
-  entities.Budget:
+  dto.EventCreateDTO:
     properties:
-      amount:
-        type: number
-      description:
-        type: string
-      eventDetails:
-        $ref: '#/definitions/entities.EventDetails'
-      eventDetailsID:
-        type: integer
-      id:
-        type: integer
-    type: object
-  entities.CalendarResponse:
-    properties:
-      endDate:
-        type: string
-      eventType:
-        type: string
-      id:
-        type: integer
-      location:
-        type: string
-      name:
-        type: string
-      startDate:
-        type: string
-    type: object
-  entities.Event:
-    properties:
-      created_at:
-        type: string
-      created_by:
-        type: string
-      deletedAt:
-        type: string
-      eventDetails:
-        $ref: '#/definitions/entities.EventDetails'
-      eventDetailsID:
-        type: integer
-      eventStatus:
-        $ref: '#/definitions/entities.EventStatus'
-      eventStatusID:
-        type: integer
-      id:
-        type: integer
-      updated_at:
-        type: string
-      user:
-        $ref: '#/definitions/entities.User'
-      year:
-        type: integer
-    type: object
-  entities.EventDetails:
-    properties:
-      deleteAt:
+      created_by_user_id:
         type: string
       end_date:
         type: string
-      eventPlane:
-        $ref: '#/definitions/entities.EventPlane'
-      eventPlaneID:
+      event_plan_id:
         type: integer
-      eventResult:
-        $ref: '#/definitions/entities.EventResult'
-      eventResultID:
+      event_status_id:
         type: integer
-      eventStrategy:
-        $ref: '#/definitions/entities.EventStrategy'
-      eventStrategyID:
+      event_strategy_id:
         type: integer
-      eventType:
-        $ref: '#/definitions/entities.EventType'
-      eventTypeID:
+      event_type_id:
         type: integer
-      eventTypeStatus:
-        $ref: '#/definitions/entities.EventTypeStatus'
-      eventTypeStatusID:
+      event_type_status_id:
+        description: Foreign key
         type: integer
       has_budget:
         type: boolean
-      id:
-        type: integer
-      instructor:
-        items:
-          $ref: '#/definitions/entities.Instructor'
-        type: array
       location:
         type: string
       methodology:
@@ -99,161 +31,212 @@ definitions:
         type: string
       rationale:
         type: string
-      responsibleUsers:
+      responsible_user_ids:
+        description: Many-to-many relationships
         items:
-          $ref: '#/definitions/entities.User'
+          type: string
+        type: array
+      speaker_ids:
+        items:
+          type: integer
         type: array
       start_date:
         type: string
+      year:
+        type: integer
     type: object
-  entities.EventPlane:
+  dto.EventResponseDTO:
     properties:
-      id:
+      created_by_user_id:
+        type: string
+      end_date:
+        type: string
+      event_id:
+        type: integer
+      event_plan_id:
+        type: integer
+      event_status_id:
+        type: integer
+      event_strategy_id:
+        type: integer
+      event_type_id:
+        type: integer
+      event_type_status_id:
+        description: Foreign key
+        type: integer
+      firstName:
+        type: string
+      goal:
+        type: string
+      has_budget:
+        type: boolean
+      lastname:
+        type: string
+      location:
+        type: string
+      methodology:
+        type: string
+      monitoring:
+        type: string
+      name:
+        type: string
+      objective:
+        type: string
+      plan:
+        type: string
+      rationale:
+        type: string
+      responsible_users:
+        description: Many-to-many relationships
+        items:
+          $ref: '#/definitions/dto.UserResponseDTO'
+        type: array
+      speakers:
+        items:
+          $ref: '#/definitions/dto.SpeakerDTO'
+        type: array
+      start_date:
+        type: string
+      status:
+        type: string
+      strategy:
+        type: string
+      tactic:
+        type: string
+      type:
+        type: string
+      typeStatus:
+        type: string
+      workPlan:
+        type: string
+      year:
+        type: integer
+    type: object
+  dto.EventStrategyResponseDTO:
+    properties:
+      event_strategy_id:
+        type: integer
+      goal:
+        type: string
+      strategy:
+        type: string
+      tactic:
+        type: string
+    type: object
+  dto.SpeakerDTO:
+    properties:
+      description:
+        type: string
+      firstname:
+        type: string
+      lastname:
+        type: string
+      speaker_id:
+        type: integer
+    type: object
+  dto.StrategyResponseDTO:
+    properties:
+      strategy:
+        type: string
+      strategy_id:
+        type: integer
+    type: object
+  dto.UserChangePasswordDTO:
+    properties:
+      new_password:
+        type: string
+      old_password:
+        type: string
+    type: object
+  dto.UserRegisterDTO:
+    properties:
+      created_at:
+        type: string
+      deleted_at:
+        type: string
+      email:
+        type: string
+      first_name:
+        type: string
+      lastname:
+        type: string
+      password:
+        type: string
+      updated_at:
+        type: string
+      user_id:
+        type: string
+      user_role_id:
+        description: Foreign key
+        type: integer
+      user_status_id:
+        type: integer
+    type: object
+  dto.UserResponseDTO:
+    properties:
+      email:
+        type: string
+      first_name:
+        type: string
+      last_name:
+        type: string
+      user_id:
+        type: string
+      userRole:
+        $ref: '#/definitions/dto.UserRoleDTO'
+      userStatus:
+        $ref: '#/definitions/dto.UserStatusDTO'
+    type: object
+  dto.UserRoleDTO:
+    properties:
+      role:
+        type: string
+      user_role_id:
+        type: integer
+    type: object
+  dto.UserStatusDTO:
+    properties:
+      status:
+        type: string
+      user_status_id:
+        type: integer
+    type: object
+  dto.UserUpdateUserRoleDTO:
+    properties:
+      user_role_id:
+        type: integer
+    type: object
+  dto.UserUpdateUserStatusDTO:
+    properties:
+      user_status_id:
+        type: integer
+    type: object
+  entities.EventPlan:
+    properties:
+      event_plan_id:
         type: integer
       work:
         type: string
       work_plane:
         type: string
     type: object
-  entities.EventResult:
-    properties:
-      deletedAt:
-        type: string
-      id:
-        type: integer
-      product:
-        type: string
-      productIndicators:
-        type: string
-      productTarget:
-        type: string
-      result:
-        type: string
-      resultIndicators:
-        type: string
-      resultTarget:
-        type: string
-    type: object
   entities.EventStatus:
     properties:
-      id:
+      event_status_id:
         type: integer
       status:
         type: string
     type: object
-  entities.EventStrategy:
-    properties:
-      goal:
-        type: string
-      id:
-        type: integer
-      strategy:
-        $ref: '#/definitions/entities.Strategy'
-      strategyID:
-        type: integer
-      tactic:
-        type: string
-    type: object
   entities.EventType:
     properties:
-      id:
+      event_type_id:
         type: integer
       type:
         type: string
     type: object
   entities.EventTypeStatus:
     properties:
-      id:
-        type: integer
-      status:
-        type: string
-    type: object
-  entities.Instructor:
-    properties:
-      created_at:
-        type: string
-      deleteAt:
-        type: string
-      description:
-        type: string
-      eventDetails:
-        items:
-          $ref: '#/definitions/entities.EventDetails'
-        type: array
-      firstname:
-        type: string
-      id:
-        type: integer
-      lastname:
-        type: string
-      updated_at:
-        type: string
-    type: object
-  entities.Notification:
-    properties:
-      active:
-        type: boolean
-      eventDetails:
-        $ref: '#/definitions/entities.EventDetails'
-      eventDetailsID:
-        type: integer
-      id:
-        type: integer
-      user:
-        $ref: '#/definitions/entities.User'
-      userId:
-        type: string
-    type: object
-  entities.Strategy:
-    properties:
-      id:
-        type: integer
-      strategy:
-        type: string
-    type: object
-  entities.User:
-    properties:
-      createdAt:
-        type: string
-      deleteAt:
-        type: string
-      email:
-        type: string
-      eventDetails:
-        items:
-          $ref: '#/definitions/entities.EventDetails'
-        type: array
-      firstName:
-        type: string
-      id:
-        type: string
-      lastname:
-        type: string
-      password:
-        type: string
-      status:
-        type: string
-      updatedAt:
-        type: string
-      userRole:
-        $ref: '#/definitions/entities.UserRole'
-      userRoleID:
-        type: integer
-      userStatus:
-        $ref: '#/definitions/entities.UserStatus'
-      userStatusID:
-        type: integer
-    type: object
-  entities.UserRole:
-    properties:
-      id:
-        type: integer
-      role:
-        type: string
-    type: object
-  entities.UserStatus:
-    properties:
-      id:
+      event_type_status_id:
         type: integer
       status:
         type: string
@@ -269,7 +252,8 @@ paths:
     post:
       consumes:
       - application/json
-      description: Authenticate a user and return a JWT token
+      description: Authenticates a user by their email and password, and returns a
+        JWT token upon successful authentication.
       parameters:
       - description: Login credentials
         in: body
@@ -286,145 +270,105 @@ paths:
       - application/json
       responses:
         "200":
-          description: OK
+          description: Login successful with JWT token
           schema:
             additionalProperties: true
             type: object
         "400":
-          description: Bad Request
+          description: Bad request due to invalid credentials
           schema:
             additionalProperties: true
             type: object
         "500":
-          description: Internal Server Error
+          description: Internal server error
           schema:
             additionalProperties: true
             type: object
-      summary: Login a user
+      summary: User login
       tags:
       - User
   /auth/logout:
     post:
       consumes:
       - application/json
-      description: Clear the JWT cookie and log out the user
+      description: Logs out the user by clearing their JWT cookie.
       produces:
       - application/json
       responses:
         "200":
-          description: OK
+          description: User logged out successfully
           schema:
             additionalProperties: true
             type: object
       security:
       - ApiKeyAuth: []
-      summary: Logout a user
+      summary: User logout
       tags:
       - User
   /auth/register:
     post:
       consumes:
       - application/json
-      description: Register a new user with email and password
+      description: Registers a new user by providing an email, password, and optional
+        first and last names, as well as user role ID.
       parameters:
-      - description: User object
+      - description: User registration details
         in: body
         name: user
         required: true
         schema:
-          $ref: '#/definitions/entities.User'
+          $ref: '#/definitions/dto.UserRegisterDTO'
       produces:
       - application/json
       responses:
         "201":
-          description: Created
+          description: User successfully created
           schema:
-            $ref: '#/definitions/entities.User'
+            $ref: '#/definitions/dto.UserRegisterDTO'
         "400":
-          description: Bad Request
+          description: Bad request due to invalid or missing input
           schema:
             additionalProperties: true
             type: object
         "500":
-          description: Internal Server Error
+          description: Internal server error
           schema:
             additionalProperties: true
             type: object
       summary: Register a new user
       tags:
       - User
-  /budget:
-    post:
-      consumes:
-      - application/json
-      description: Create a new Budget with the provided details
-      parameters:
-      - description: Budget object
-        in: body
-        name: Budget
-        required: true
-        schema:
-          $ref: '#/definitions/entities.Budget'
-      produces:
-      - application/json
-      responses:
-        "201":
-          description: Created
-          schema:
-            additionalProperties: true
-            type: object
-        "400":
-          description: Bad Request
-          schema:
-            additionalProperties: true
-            type: object
-        "500":
-          description: Internal Server Error
-          schema:
-            additionalProperties: true
-            type: object
-      security:
-      - ApiKeyAuth: []
-      summary: Create a new Budget
-      tags:
-      - Budget
-  /budget/{id}:
-    delete:
-      consumes:
-      - application/json
-      description: Delete an Budget by ID
-      parameters:
-      - description: Budget ID
-        in: path
-        name: id
-        required: true
-        type: integer
-      produces:
-      - application/json
-      responses:
-        "204":
-          description: No Content
-        "400":
-          description: Bad Request
-          schema:
-            additionalProperties: true
-            type: object
-        "500":
-          description: Internal Server Error
-          schema:
-            additionalProperties: true
-            type: object
-      security:
-      - ApiKeyAuth: []
-      summary: Delete an Budget
-      tags:
-      - Budget
+  /event-strategies:
     get:
       consumes:
       - application/json
-      description: Retrieve an Budget by ID
+      description: Retrieve a list of all event strategies
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: List of all event strategies
+          schema:
+            items:
+              $ref: '#/definitions/dto.EventStrategyResponseDTO'
+            type: array
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - ApiKeyAuth: []
+      summary: Get all event strategies
+      tags:
+      - Event Strategy
+  /event-strategy/{id}:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve an event strategy by its unique ID
       parameters:
-      - description: Budget ID
+      - description: Event Strategy ID
         in: path
         name: id
         required: true
@@ -433,151 +377,87 @@ paths:
       - application/json
       responses:
         "200":
-          description: OK
+          description: Successfully retrieved event strategy
           schema:
-            $ref: '#/definitions/entities.Budget'
+            $ref: '#/definitions/dto.EventStrategyResponseDTO'
         "400":
-          description: Bad Request
+          description: Invalid ID format
           schema:
             additionalProperties: true
             type: object
         "404":
-          description: Not Found
+          description: Event strategy not found
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal server error
           schema:
             additionalProperties: true
             type: object
       security:
       - ApiKeyAuth: []
-      summary: Get an Budget by ID
+      summary: Get an event strategy by ID
       tags:
-      - Budget
-  /budgets:
+      - Event Strategy
+  /events:
     get:
       consumes:
       - application/json
-      description: Retrieve a list of all Budget
+      description: Retrieve all events from the system
       produces:
       - application/json
       responses:
         "200":
-          description: OK
+          description: Successfully retrieved all events
           schema:
             items:
-              $ref: '#/definitions/entities.Budget'
+              $ref: '#/definitions/dto.EventResponseDTO'
             type: array
         "500":
-          description: Internal Server Error
+          description: Internal server error
           schema:
             additionalProperties: true
             type: object
-      security:
-      - ApiKeyAuth: []
-      summary: Get all Budget
+      summary: Get all events
       tags:
-      - Budget
-  /budgets/{id}:
-    put:
-      consumes:
-      - application/json
-      description: Update an existing Budget by ID
-      parameters:
-      - description: Budget ID
-        in: path
-        name: id
-        required: true
-        type: integer
-      - description: Updated instructor object
-        in: body
-        name: Budget
-        required: true
-        schema:
-          $ref: '#/definitions/entities.Budget'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            additionalProperties: true
-            type: object
-        "400":
-          description: Bad Request
-          schema:
-            additionalProperties: true
-            type: object
-        "500":
-          description: Internal Server Error
-          schema:
-            additionalProperties: true
-            type: object
-      security:
-      - ApiKeyAuth: []
-      summary: Update an instructor
-      tags:
-      - Budget
-  /calendar:
-    get:
-      consumes:
-      - application/json
-      description: Get all event details, sorted by start date
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            items:
-              $ref: '#/definitions/entities.CalendarResponse'
-            type: array
-        "500":
-          description: Internal Server Error
-          schema:
-            additionalProperties: true
-            type: object
-      security:
-      - ApiKeyAuth: []
-      summary: Retrieve event calendar
-      tags:
-      - Calendar
-  /event:
+      - Event
     post:
       consumes:
       - application/json
-      description: Create a new event with the provided details
+      description: Create a new event in the system
       parameters:
-      - description: Event object
+      - description: Event information
         in: body
         name: event
         required: true
         schema:
-          $ref: '#/definitions/entities.Event'
+          $ref: '#/definitions/dto.EventCreateDTO'
       produces:
       - application/json
       responses:
         "201":
-          description: Created
+          description: Successfully created event
           schema:
-            $ref: '#/definitions/entities.Event'
+            $ref: '#/definitions/dto.EventResponseDTO'
         "400":
-          description: Bad Request
+          description: Bad request
           schema:
             additionalProperties: true
             type: object
         "500":
-          description: Internal Server Error
+          description: Internal server error
           schema:
             additionalProperties: true
             type: object
-      security:
-      - ApiKeyAuth: []
       summary: Create a new event
       tags:
       - Event
-  /event/{id}:
+  /events/{id}:
     delete:
       consumes:
       - application/json
-      description: Delete an event by ID
+      description: Delete an event from the system
       parameters:
       - description: Event ID
         in: path
@@ -587,20 +467,26 @@ paths:
       produces:
       - application/json
       responses:
-        "204":
-          description: No Content
+        "200":
+          description: Successfully deleted event
+          schema:
+            additionalProperties: true
+            type: object
         "400":
-          description: Bad Request
+          description: Bad request
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: Event not found
           schema:
             additionalProperties: true
             type: object
         "500":
-          description: Internal Server Error
+          description: Internal server error
           schema:
             additionalProperties: true
             type: object
-      security:
-      - ApiKeyAuth: []
       summary: Delete an event
       tags:
       - Event
@@ -618,129 +504,194 @@ paths:
       - application/json
       responses:
         "200":
-          description: OK
+          description: Successfully retrieved event
           schema:
-            $ref: '#/definitions/entities.Event'
-        "400":
-          description: Bad Request
-          schema:
-            additionalProperties: true
-            type: object
+            $ref: '#/definitions/dto.EventResponseDTO'
         "404":
-          description: Not Found
+          description: Event not found
           schema:
             additionalProperties: true
             type: object
-      security:
-      - ApiKeyAuth: []
-      summary: Get an event by ID
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Get event by ID
       tags:
       - Event
     put:
       consumes:
       - application/json
-      description: Update an existing event by ID
+      description: Update an existing event in the system
       parameters:
       - description: Event ID
         in: path
         name: id
         required: true
         type: integer
-      - description: Updated event object
+      - description: Updated event information
         in: body
         name: event
         required: true
         schema:
-          $ref: '#/definitions/entities.Event'
+          $ref: '#/definitions/dto.EventCreateDTO'
       produces:
       - application/json
       responses:
         "200":
-          description: OK
+          description: Successfully updated event
+          schema:
+            $ref: '#/definitions/dto.EventResponseDTO'
+        "400":
+          description: Bad request
           schema:
             additionalProperties: true
             type: object
-        "400":
-          description: Bad Request
+        "404":
+          description: Event not found
           schema:
             additionalProperties: true
             type: object
         "500":
-          description: Internal Server Error
+          description: Internal server error
           schema:
             additionalProperties: true
             type: object
-      security:
-      - ApiKeyAuth: []
       summary: Update an event
       tags:
       - Event
-  /events:
+  /events/plans:
     get:
       consumes:
       - application/json
-      description: Retrieve a list of all events
+      description: Retrieve all event plans from the system
       produces:
       - application/json
       responses:
         "200":
-          description: OK
+          description: Successfully retrieved all event plans
           schema:
             items:
-              $ref: '#/definitions/entities.Event'
+              $ref: '#/definitions/entities.EventPlan'
             type: array
         "500":
-          description: Internal Server Error
+          description: Internal server error
           schema:
             additionalProperties: true
             type: object
-      security:
-      - ApiKeyAuth: []
-      summary: Get all events
+      summary: Get all event plans
       tags:
       - Event
-  /instructor:
+  /events/status:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve all event status from the system
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Successfully retrieved all event status
+          schema:
+            items:
+              $ref: '#/definitions/entities.EventStatus'
+            type: array
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Get all event status
+      tags:
+      - Event
+  /events/types:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve all event types from the system
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Successfully retrieved all event types
+          schema:
+            items:
+              $ref: '#/definitions/entities.EventType'
+            type: array
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Get all event types
+      tags:
+      - Event
+  /events/types/status:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve all event type status from the system
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Successfully retrieved all event type status
+          schema:
+            items:
+              $ref: '#/definitions/entities.EventTypeStatus'
+            type: array
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Get all event type status
+      tags:
+      - Event
+  /speaker:
     post:
       consumes:
       - application/json
-      description: Create a new instructor with the provided details
+      description: Creates a new speaker by providing the speaker's first name, last
+        name, and description
       parameters:
-      - description: Instructor object
+      - description: Speaker details
         in: body
-        name: instructor
+        name: speaker
         required: true
         schema:
-          $ref: '#/definitions/entities.Instructor'
+          $ref: '#/definitions/dto.SpeakerDTO'
       produces:
       - application/json
       responses:
         "201":
-          description: Created
+          description: Speaker created successfully
           schema:
             additionalProperties: true
             type: object
         "400":
-          description: Bad Request
+          description: Invalid input
           schema:
             additionalProperties: true
             type: object
         "500":
-          description: Internal Server Error
+          description: Internal server error
           schema:
             additionalProperties: true
             type: object
       security:
       - ApiKeyAuth: []
-      summary: Create a new instructor
+      summary: Create a new Speaker
       tags:
-      - Instructor
-  /instructor/{id}:
+      - Speaker
+  /speaker/{id}:
     delete:
       consumes:
       - application/json
-      description: Delete an instructor by ID
+      description: Delete a speaker by their unique speaker ID
       parameters:
-      - description: Instructor ID
+      - description: Speaker ID
         in: path
         name: id
         required: true
@@ -749,28 +700,28 @@ paths:
       - application/json
       responses:
         "204":
-          description: No Content
+          description: Speaker deleted successfully
         "400":
-          description: Bad Request
+          description: Invalid speaker ID
           schema:
             additionalProperties: true
             type: object
         "500":
-          description: Internal Server Error
+          description: Internal server error
           schema:
             additionalProperties: true
             type: object
       security:
       - ApiKeyAuth: []
-      summary: Delete an instructor
+      summary: Delete a speaker
       tags:
-      - Instructor
+      - Speaker
     get:
       consumes:
       - application/json
-      description: Retrieve an instructor by its ID
+      description: Retrieve a speaker's details by their unique speaker ID
       parameters:
-      - description: Instructor ID
+      - description: Speaker ID
         in: path
         name: id
         required: true
@@ -779,125 +730,119 @@ paths:
       - application/json
       responses:
         "200":
-          description: OK
+          description: Speaker details retrieved successfully
           schema:
-            $ref: '#/definitions/entities.Instructor'
+            $ref: '#/definitions/dto.SpeakerDTO'
         "400":
-          description: Bad Request
+          description: Invalid ID format
           schema:
             additionalProperties: true
             type: object
         "404":
-          description: Not Found
+          description: Speaker not found
           schema:
             additionalProperties: true
             type: object
       security:
       - ApiKeyAuth: []
-      summary: Get an instructor by ID
+      summary: Get a Speaker by ID
       tags:
-      - Instructor
+      - Speaker
     put:
       consumes:
       - application/json
-      description: Update an existing instructor by ID
+      description: Update a speaker's details (first name, last name, description)
+        by their unique speaker ID
       parameters:
-      - description: Instructor ID
+      - description: Speaker ID
         in: path
         name: id
         required: true
         type: integer
-      - description: Updated instructor object
+      - description: Updated speaker details
         in: body
-        name: instructor
+        name: speaker
         required: true
         schema:
-          $ref: '#/definitions/entities.Instructor'
+          $ref: '#/definitions/dto.SpeakerDTO'
       produces:
       - application/json
       responses:
         "200":
-          description: OK
+          description: Speaker updated successfully
           schema:
             additionalProperties: true
             type: object
         "400":
-          description: Bad Request
+          description: Invalid input or speaker ID
           schema:
             additionalProperties: true
             type: object
         "500":
-          description: Internal Server Error
+          description: Internal server error
           schema:
             additionalProperties: true
             type: object
       security:
       - ApiKeyAuth: []
-      summary: Update an instructor
+      summary: Update an existing Speaker
       tags:
-      - Instructor
-  /instructors:
+      - Speaker
+  /speakers:
     get:
       consumes:
       - application/json
-      description: Retrieve a list of all instructors
+      description: Retrieve a list of all speakers
       produces:
       - application/json
       responses:
         "200":
-          description: OK
+          description: List of all speakers
           schema:
             items:
-              $ref: '#/definitions/entities.Instructor'
+              $ref: '#/definitions/dto.SpeakerDTO'
             type: array
         "500":
-          description: Internal Server Error
+          description: Internal server error
           schema:
             additionalProperties: true
             type: object
       security:
       - ApiKeyAuth: []
-      summary: Get all instructors
+      summary: Get all Speakers
       tags:
-      - Instructor
-  /notifications/{id}:
-    delete:
+      - Speaker
+  /strategies:
+    get:
       consumes:
       - application/json
-      description: Delete a notification by its ID
-      parameters:
-      - description: Notification ID
-        in: path
-        name: id
-        required: true
-        type: integer
+      description: Retrieve a list of all strategies
       produces:
       - application/json
       responses:
-        "204":
-          description: No Content
-        "400":
-          description: Bad Request
+        "200":
+          description: List of all strategies
           schema:
-            additionalProperties: true
-            type: object
+            items:
+              $ref: '#/definitions/dto.StrategyResponseDTO'
+            type: array
         "500":
-          description: Internal Server Error
+          description: Internal server error
           schema:
             additionalProperties: true
             type: object
       security:
       - ApiKeyAuth: []
-      summary: Delete a notification
+      summary: Get all strategies
       tags:
-      - Notification
-  /notifications/{id}/inactive:
-    patch:
+      - Strategy
+  /strategy/{id}:
+    get:
       consumes:
       - application/json
-      description: Deactivate a notification by setting its active status to false
+      description: Retrieve a strategy by its unique ID from the database
       parameters:
-      - description: Notification ID
+      - description: Strategy ID
         in: path
         name: id
         required: true
@@ -906,60 +851,34 @@ paths:
       - application/json
       responses:
         "200":
-          description: OK
+          description: Successfully retrieved strategy
           schema:
-            additionalProperties: true
-            type: object
+            $ref: '#/definitions/dto.StrategyResponseDTO'
         "400":
-          description: Bad Request
+          description: Invalid ID format
           schema:
             additionalProperties: true
             type: object
-        "500":
-          description: Internal Server Error
-          schema:
-            additionalProperties: true
-            type: object
-      security:
-      - ApiKeyAuth: []
-      summary: Deactivate a notification
-      tags:
-      - Notification
-  /notifications/user/{id}:
-    get:
-      consumes:
-      - application/json
-      description: Retrieve all notifications for a specific user by their ID
-      parameters:
-      - description: User ID
-        in: path
-        name: id
-        required: true
-        type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            items:
-              $ref: '#/definitions/entities.Notification'
-            type: array
         "404":
-          description: Not Found
+          description: Strategy not found
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal server error
           schema:
             additionalProperties: true
             type: object
       security:
       - ApiKeyAuth: []
-      summary: Get notifications by user ID
+      summary: Get a strategy by ID
       tags:
-      - Notification
+      - Strategy
   /user/{id}:
     delete:
       consumes:
       - application/json
-      description: Delete a user by ID
+      description: Deletes a user from the system using their unique ID.
       parameters:
       - description: User ID
         in: path
@@ -970,9 +889,9 @@ paths:
       - application/json
       responses:
         "204":
-          description: No Content
+          description: User successfully deleted
         "500":
-          description: Internal Server Error
+          description: Internal server error
           schema:
             additionalProperties: true
             type: object
@@ -984,7 +903,7 @@ paths:
     get:
       consumes:
       - application/json
-      description: Retrieve a user by its ID
+      description: Fetches the user details based on their unique user ID.
       parameters:
       - description: User ID
         in: path
@@ -995,80 +914,161 @@ paths:
       - application/json
       responses:
         "200":
-          description: OK
+          description: User details retrieved successfully
           schema:
-            $ref: '#/definitions/entities.User'
+            $ref: '#/definitions/dto.UserResponseDTO'
         "404":
-          description: Not Found
+          description: User not found
           schema:
             additionalProperties: true
             type: object
       security:
       - ApiKeyAuth: []
-      summary: Get a user by ID
+      summary: Retrieve a user by ID
       tags:
       - User
+  /user/{id}/change-password:
     put:
       consumes:
       - application/json
-      description: Update an existing user by ID
+      description: Allows a user to change their password after verifying the old
+        password.
       parameters:
       - description: User ID
         in: path
         name: id
         required: true
         type: string
-      - description: Updated user object
+      - description: Old and new password
         in: body
-        name: user
+        name: password
         required: true
         schema:
-          $ref: '#/definitions/entities.User'
+          $ref: '#/definitions/dto.UserChangePasswordDTO'
       produces:
       - application/json
       responses:
         "200":
-          description: OK
+          description: Password successfully changed
           schema:
             additionalProperties: true
             type: object
         "400":
-          description: Bad Request
+          description: Bad request due to invalid input
           schema:
             additionalProperties: true
             type: object
         "500":
-          description: Internal Server Error
+          description: Internal server error
           schema:
             additionalProperties: true
             type: object
       security:
       - ApiKeyAuth: []
-      summary: Update a user
+      summary: Change user password
+      tags:
+      - User
+  /user/{id}/role:
+    put:
+      consumes:
+      - application/json
+      description: Updates the role of a user by their unique ID.
+      parameters:
+      - description: User ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: New user role
+        in: body
+        name: role
+        required: true
+        schema:
+          $ref: '#/definitions/dto.UserUpdateUserRoleDTO'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: User role updated successfully
+          schema:
+            $ref: '#/definitions/dto.UserResponseDTO'
+        "400":
+          description: Bad request due to invalid input
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - ApiKeyAuth: []
+      summary: Update user role
+      tags:
+      - User
+  /user/{id}/status:
+    put:
+      consumes:
+      - application/json
+      description: Changes the user status (e.g., active, inactive) based on their
+        ID.
+      parameters:
+      - description: User ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: New user status
+        in: body
+        name: status
+        required: true
+        schema:
+          $ref: '#/definitions/dto.UserUpdateUserStatusDTO'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: User status updated successfully
+          schema:
+            $ref: '#/definitions/dto.UserResponseDTO'
+        "400":
+          description: Bad request due to invalid input
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - ApiKeyAuth: []
+      summary: Update user status
       tags:
       - User
   /users:
     get:
       consumes:
       - application/json
-      description: Retrieve a list of all users
+      description: Fetches a list of all registered users with their details.
       produces:
       - application/json
       responses:
         "200":
-          description: OK
+          description: List of users retrieved successfully
           schema:
             items:
-              $ref: '#/definitions/entities.User'
+              $ref: '#/definitions/dto.UserResponseDTO'
             type: array
         "500":
-          description: Internal Server Error
+          description: Internal server error
           schema:
             additionalProperties: true
             type: object
       security:
       - ApiKeyAuth: []
-      summary: Get all users
+      summary: Retrieve a list of all users
       tags:
       - User
 schemes:
