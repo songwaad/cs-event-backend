@@ -7,12 +7,12 @@ import (
 	"github.com/songwaad/cs-event-backend/usecases"
 )
 
-type HttpSpeakerHandle struct {
+type HttpSpeakerHandler struct {
 	speakerUseCase usecases.SpeakerUseCase
 }
 
-func NewHttpSpeakerHandle(speakerUseCase usecases.SpeakerUseCase) *HttpSpeakerHandle {
-	return &HttpSpeakerHandle{speakerUseCase: speakerUseCase}
+func NewHttpSpeakerHandler(speakerUseCase usecases.SpeakerUseCase) *HttpSpeakerHandler {
+	return &HttpSpeakerHandler{speakerUseCase: speakerUseCase}
 }
 
 // CreateSpeaker godoc
@@ -27,7 +27,7 @@ func NewHttpSpeakerHandle(speakerUseCase usecases.SpeakerUseCase) *HttpSpeakerHa
 // @Failure 400 {object} map[string]interface{} "Invalid input"
 // @Failure 500 {object} map[string]interface{} "Internal server error"
 // @Router /speaker [post]
-func (h *HttpSpeakerHandle) CreateSpeaker(c *fiber.Ctx) error {
+func (h *HttpSpeakerHandler) CreateSpeaker(c *fiber.Ctx) error {
 	var input entities.Speaker
 	if err := c.BodyParser(&input); err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
@@ -73,7 +73,7 @@ func (h *HttpSpeakerHandle) CreateSpeaker(c *fiber.Ctx) error {
 // @Failure 400 {object} map[string]interface{} "Invalid ID format"
 // @Failure 404 {object} map[string]interface{} "Speaker not found"
 // @Router /speaker/{id} [get]
-func (h *HttpSpeakerHandle) GetSpeakerByID(c *fiber.Ctx) error {
+func (h *HttpSpeakerHandler) GetSpeakerByID(c *fiber.Ctx) error {
 	speakerID, err := c.ParamsInt("id")
 	if err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
@@ -102,7 +102,7 @@ func (h *HttpSpeakerHandle) GetSpeakerByID(c *fiber.Ctx) error {
 // @Success 200 {array} dto.SpeakerDTO "List of all speakers"
 // @Failure 500 {object} map[string]interface{} "Internal server error"
 // @Router /speakers [get]
-func (h *HttpSpeakerHandle) GetAllSpeakers(c *fiber.Ctx) error {
+func (h *HttpSpeakerHandler) GetAllSpeakers(c *fiber.Ctx) error {
 	speakers, err := h.speakerUseCase.GetAllSpeakers()
 	if err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
@@ -133,7 +133,7 @@ func (h *HttpSpeakerHandle) GetAllSpeakers(c *fiber.Ctx) error {
 // @Failure 400 {object} map[string]interface{} "Invalid input or speaker ID"
 // @Failure 500 {object} map[string]interface{} "Internal server error"
 // @Router /speaker/{id} [put]
-func (h *HttpSpeakerHandle) UpdateSpeaker(c *fiber.Ctx) error {
+func (h *HttpSpeakerHandler) UpdateSpeaker(c *fiber.Ctx) error {
 	speakerID, err := c.ParamsInt("id")
 	if err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
@@ -188,7 +188,7 @@ func (h *HttpSpeakerHandle) UpdateSpeaker(c *fiber.Ctx) error {
 // @Failure 400 {object} map[string]interface{} "Invalid speaker ID"
 // @Failure 500 {object} map[string]interface{} "Internal server error"
 // @Router /speaker/{id} [delete]
-func (h *HttpSpeakerHandle) DeleteSpeaker(c *fiber.Ctx) error {
+func (h *HttpSpeakerHandler) DeleteSpeaker(c *fiber.Ctx) error {
 	speakerID, err := c.ParamsInt("id")
 	if err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
