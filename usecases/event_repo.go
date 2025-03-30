@@ -1,6 +1,8 @@
 package usecases
 
-import "github.com/songwaad/cs-event-backend/entities"
+import (
+	"github.com/songwaad/cs-event-backend/entities"
+)
 
 // import (
 // 	"github.com/songwaad/cs-event-backend/entities"
@@ -20,6 +22,4 @@ type EventRepo interface {
 
 	AddSpeakersToEvent(event *entities.Event, speakerIDs []uint) error
 	AddResponsibleUsersToEvent(event *entities.Event, userIDs []string) error
-
-	//GetCalendarEvents() ([]entities.CalendarResponse, error)
 }

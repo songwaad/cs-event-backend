@@ -1,6 +1,7 @@
 package adapters
 
 import (
+	"sort"
 	"strconv"
 
 	"github.com/gofiber/fiber/v2"
@@ -9,12 +10,12 @@ import (
 	"github.com/songwaad/cs-event-backend/usecases"
 )
 
-type HttpEventHandle struct {
+type HttpEventHandler struct {
 	eventUseCase usecases.EventUseCase
 }
 
-func NewHttpEventHandle(eventUseCase usecases.EventUseCase) *HttpEventHandle {
-	return &HttpEventHandle{eventUseCase: eventUseCase}
+func NewHttpEventHandler(eventUseCase usecases.EventUseCase) *HttpEventHandler {
+	return &HttpEventHandler{eventUseCase: eventUseCase}
 }
 
 // GetAllEventTypeStatus godoc
@@ -26,7 +27,7 @@ func NewHttpEventHandle(eventUseCase usecases.EventUseCase) *HttpEventHandle {
 // @Success 200 {array} entities.EventTypeStatus "Successfully retrieved all event type status"
 // @Failure 500 {object} map[string]interface{} "Internal server error"
 // @Router /events/types/status [get]
-func (h *HttpEventHandle) GetAllEventTypeStatus(c *fiber.Ctx) error {
+func (h *HttpEventHandler) GetAllEventTypeStatus(c *fiber.Ctx) error {
 	eventTypeStatus, err := h.eventUseCase.GetAllEventTypeStatus()
 	if err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
@@ -46,7 +47,7 @@ func (h *HttpEventHandle) GetAllEventTypeStatus(c *fiber.Ctx) error {
 // @Success 200 {array} entities.EventType "Successfully retrieved all event types"
 // @Failure 500 {object} map[string]interface{} "Internal server error"
 // @Router /events/types [get]
-func (h *HttpEventHandle) GetAllEventType(c *fiber.Ctx) error {
+func (h *HttpEventHandler) GetAllEventType(c *fiber.Ctx) error {
 	eventTypes, err := h.eventUseCase.GetAllEventType()
 	if err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
@@ -66,7 +67,7 @@ func (h *HttpEventHandle) GetAllEventType(c *fiber.Ctx) error {
 // @Success 200 {array} entities.EventStatus "Successfully retrieved all event status"
 // @Failure 500 {object} map[string]interface{} "Internal server error"
 // @Router /events/status [get]
-func (h *HttpEventHandle) GetAllEventStatus(c *fiber.Ctx) error {
+func (h *HttpEventHandler) GetAllEventStatus(c *fiber.Ctx) error {
 	eventStatus, err := h.eventUseCase.GetAllEventStatus()
 	if err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
@@ -86,7 +87,7 @@ func (h *HttpEventHandle) GetAllEventStatus(c *fiber.Ctx) error {
 // @Success 200 {array} entities.EventPlan "Successfully retrieved all event plans"
 // @Failure 500 {object} map[string]interface{} "Internal server error"
 // @Router /events/plans [get]
-func (h *HttpEventHandle) GetAllEventPlan(c *fiber.Ctx) error {
+func (h *HttpEventHandler) GetAllEventPlan(c *fiber.Ctx) error {
 	eventPlans, err := h.eventUseCase.GetAllEventPlan()
 	if err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
@@ -108,7 +109,7 @@ func (h *HttpEventHandle) GetAllEventPlan(c *fiber.Ctx) error {
 // @Failure 400 {object} map[string]interface{} "Bad request"
 // @Failure 500 {object} map[string]interface{} "Internal server error"
 // @Router /event [post]
-func (h *HttpEventHandle) CreateEvent(c *fiber.Ctx) error {
+func (h *HttpEventHandler) CreateEvent(c *fiber.Ctx) error {
 	var input dto.EventCreateDTO
 	if err := c.BodyParser(&input); err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
@@ -185,7 +186,7 @@ func (h *HttpEventHandle) CreateEvent(c *fiber.Ctx) error {
 // @Failure 404 {object} map[string]interface{} "Event not found"
 // @Failure 500 {object} map[string]interface{} "Internal server error"
 // @Router /event/{id} [get]
-func (h *HttpEventHandle) GetEventByID(c *fiber.Ctx) error {
+func (h *HttpEventHandler) GetEventByID(c *fiber.Ctx) error {
 	eventID, err := strconv.Atoi(c.Params("id"))
 	if err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
@@ -213,7 +214,7 @@ func (h *HttpEventHandle) GetEventByID(c *fiber.Ctx) error {
 // @Success 200 {array} dto.EventResponseDTO "Successfully retrieved all events"
 // @Failure 500 {object} map[string]interface{} "Internal server error"
 // @Router /events [get]
-func (h *HttpEventHandle) GetAllEvents(c *fiber.Ctx) error {
+func (h *HttpEventHandler) GetAllEvents(c *fiber.Ctx) error {
 	events, err := h.eventUseCase.GetAllEvents()
 	if err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
@@ -244,7 +245,7 @@ func (h *HttpEventHandle) GetAllEvents(c *fiber.Ctx) error {
 // @Failure 404 {object} map[string]interface{} "Event not found"
 // @Failure 500 {object} map[string]interface{} "Internal server error"
 // @Router /event/{id} [put]
-func (h *HttpEventHandle) UpdateEvent(c *fiber.Ctx) error {
+func (h *HttpEventHandler) UpdateEvent(c *fiber.Ctx) error {
 	id, err := strconv.Atoi(c.Params("id"))
 	if err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
@@ -308,7 +309,7 @@ func (h *HttpEventHandle) UpdateEvent(c *fiber.Ctx) error {
 // @Failure 404 {object} map[string]interface{} "Event not found"
 // @Failure 500 {object} map[string]interface{} "Internal server error"
 // @Router /event/{id} [delete]
-func (h *HttpEventHandle) DeleteEvent(c *fiber.Ctx) error {
+func (h *HttpEventHandler) DeleteEvent(c *fiber.Ctx) error {
 	id, err := strconv.Atoi(c.Params("id"))
 	if err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
@@ -334,4 +335,36 @@ func (h *HttpEventHandle) DeleteEvent(c *fiber.Ctx) error {
 	return c.Status(fiber.StatusOK).JSON(fiber.Map{
 		"message": "Event deleted successfully",
 	})
+}
+
+// GetCalendarEvents godoc
+// @Summary Get all calendar events
+// @Description Retrieve all events and return them ordered by start date
+// @Tags Event
+// @Accept json
+// @Produce json
+// @Security ApiKeyAuth
+// @Success 200 {array} dto.CalendarResponseDTO "Successfully retrieved all calendar events"
+// @Failure 500 {object} map[string]interface{} "Internal server error"
+// @Router /events/calendar [get]
+func (h *HttpEventHandler) GetCalendarEvents(c *fiber.Ctx) error {
+	events, err := h.eventUseCase.GetAllEvents()
+	if err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"message": err.Error(),
+		})
+	}
+
+	sort.Slice(events, func(i, j int) bool {
+		return events[i].StartDate.Before(events[j].StartDate)
+	})
+
+	var calendarResponses []dto.CalendarResponseDTO
+	for _, event := range events {
+		response := dto.ToCalendarResponseDTO(&event)
+		calendarResponses = append(calendarResponses, response)
+	}
+
+	// ส่งผลลัพธ์กลับไปยังผู้ใช้
+	return c.Status(fiber.StatusOK).JSON(calendarResponses)
 }
