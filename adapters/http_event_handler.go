@@ -346,7 +346,7 @@ func (h *HttpEventHandler) DeleteEvent(c *fiber.Ctx) error {
 // GetCalendarEvents godoc
 // @Summary Get all calendar events
 // @Description Retrieve all events and return them ordered by start date
-// @Tags Event
+// @Tags Calendar
 // @Accept json
 // @Produce json
 // @Security ApiKeyAuth
