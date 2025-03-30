@@ -2,6 +2,7 @@ package adapters
 
 import (
 	"github.com/gofiber/fiber/v2"
+	"github.com/songwaad/cs-event-backend/dto"
 	"github.com/songwaad/cs-event-backend/usecases"
 )
 
@@ -21,7 +22,7 @@ func NewHttpNotificationHandler(notificationUseCase usecases.NotificationUsecase
 // @Produce json
 // @Security ApiKeyAuth
 // @Param id path string true "User ID"
-// @Success 200 {array} entities.Notification
+// @Success 200 {array} dto.NotifyResponseDTO
 // @Failure 404 {object} map[string]interface{}
 // @Router /notifications/user/{id} [get]
 func (h *HttpNotificationHandler) GetNotifyByID(c *fiber.Ctx) error {
@@ -34,7 +35,14 @@ func (h *HttpNotificationHandler) GetNotifyByID(c *fiber.Ctx) error {
 		})
 	}
 
-	return c.Status(fiber.StatusOK).JSON(notifications)
+	var responses []dto.NotifyResponseDTO
+
+	for _, notification := range notifications {
+		response := dto.ToNotifyResponseDTP(&notification)
+		responses = append(responses, response)
+	}
+
+	return c.Status(fiber.StatusOK).JSON(responses)
 }
 
 // InActive godoc

@@ -16,12 +16,7 @@ func NewGormNotificationRepo(DB *gorm.DB) usecases.NotificationRepo {
 
 func (r *GormNotificationRepo) GetByUserID(userID string) ([]entities.Notification, error) {
 	var notifications []entities.Notification
-	result := r.DB.
-		Where("userID = ?", userID).
-		Preload("EventDetails", func(db *gorm.DB) *gorm.DB {
-			return db.Select("id", "name", "startdate", "enddate", "objective")
-		}).
-		Find(&notifications)
+	result := r.DB.Where("userID = ?", userID).Preload("Event").Find(&notifications)
 	if result.Error != nil {
 		return nil, result.Error
 	}
