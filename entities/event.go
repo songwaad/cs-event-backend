@@ -24,6 +24,7 @@ type Event struct {
 	Result            string
 	ResultIndicators  string `json:"result_indicators"`
 	ResultTarget      string `json:"result_target"`
+	ImageUrl          string `json:"monitoring"`
 
 	// Foreign key
 	EventTypeStatusID uint `json:"event_type_status_id"`

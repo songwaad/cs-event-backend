@@ -21,6 +21,7 @@ type UserRegisterDTO struct {
 	Password  string
 	FirstName string `json:"first_name"`
 	Lastname  string
+	ImageUrl  string
 
 	// Foreign key
 	UserRoleID   uint `json:"user_role_id"`
@@ -36,6 +37,7 @@ type UserUpdateUserRoleDTO struct {
 }
 
 type UserChangePasswordDTO struct {
+	Email       string
 	OldPassword string `json:"old_password"`
 	NewPassword string `json:"new_password"`
 }
@@ -47,6 +49,8 @@ type UserResponseDTO struct {
 	Lastname   string `json:"last_name"`
 	UserRole   UserRoleDTO
 	UserStatus UserStatusDTO
+	ImageUrl   string
+	CreatedAt  time.Time
 }
 
 type UserRoleDTO struct {
@@ -67,6 +71,8 @@ func ToUserResponseDTO(entity entities.User) UserResponseDTO {
 		Lastname:   entity.Lastname,
 		UserRole:   ToUserRoleDTO(entity.UserRole),
 		UserStatus: ToUserStatusDTO(entity.UserStatus),
+		CreatedAt:  entity.CreatedAt,
+		ImageUrl:   entity.FirstName,
 	}
 }
 

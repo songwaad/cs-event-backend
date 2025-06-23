@@ -7,6 +7,7 @@ import (
 )
 
 type CalendarResponseDTO struct {
+	EventID   uint      `json:"event_id"`
 	Name      string    `json:"name"`
 	StartDate time.Time `json:"startDate"`
 	EndDate   time.Time `json:"endDate"`
@@ -16,10 +17,11 @@ type CalendarResponseDTO struct {
 
 func ToCalendarResponseDTO(event *entities.Event) CalendarResponseDTO {
 	return CalendarResponseDTO{
+		EventID:   event.EventID,
 		Name:      event.Name,
 		StartDate: event.StartDate,
 		EndDate:   event.EndDate,
 		Location:  event.Location,
-		EventType: event.EventType.Type,
+		EventType: event.EventTypeStatus.Status,
 	}
 }

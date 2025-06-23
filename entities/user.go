@@ -19,6 +19,7 @@ type User struct {
 	UserStatusID uint `json:"user_status_id"`
 	UserStatus   UserStatus
 	Status       string
+	ImageUrl     string
 
 	// Many-to-many relationships
 	Event []Event `gorm:"many2many:event_responsible;"`

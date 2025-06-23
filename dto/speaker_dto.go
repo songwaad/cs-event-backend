@@ -7,6 +7,7 @@ type SpeakerDTO struct {
 	FirstName   string `json:"firstname"`
 	Lastname    string `json:"lastname"`
 	Description string `json:"description"`
+	ImageUrl    string
 }
 
 func ToSpeakerResponseDTO(entity entities.Speaker) SpeakerDTO {
@@ -15,5 +16,6 @@ func ToSpeakerResponseDTO(entity entities.Speaker) SpeakerDTO {
 		FirstName:   entity.FirstName,
 		Lastname:    entity.Lastname,
 		Description: entity.Description,
+		ImageUrl:    entity.ImageUrl,
 	}
 }

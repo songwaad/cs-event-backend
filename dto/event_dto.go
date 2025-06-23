@@ -17,6 +17,7 @@ type EventCreateDTO struct {
 	Methodology string    `json:"methodology"`
 	HasBudget   bool      `json:"has_budget"`
 	Monitoring  string    `json:"monitoring"`
+	ImageUrl    string    `json:"monitoring"`
 
 	// Foreign key
 	EventTypeStatusID uint   `json:"event_type_status_id"`
@@ -43,6 +44,7 @@ type EventResponseDTO struct {
 	Methodology string    `json:"methodology"`
 	HasBudget   bool      `json:"has_budget"`
 	Monitoring  string    `json:"monitoring"`
+	ImageUrl    string    `json:"image_url"`
 
 	// Foreign key
 	EventTypeStatusID uint `json:"event_type_status_id"`
@@ -78,6 +80,7 @@ func ToEventResponseDTO(event *entities.Event) *EventResponseDTO {
 			UserID:    user.UserID,
 			FirstName: user.FirstName,
 			Lastname:  user.Lastname,
+			ImageUrl:  user.ImageUrl,
 		})
 	}
 
@@ -88,6 +91,7 @@ func ToEventResponseDTO(event *entities.Event) *EventResponseDTO {
 			FirstName:   speaker.FirstName,
 			Lastname:    speaker.Lastname,
 			Description: speaker.Description,
+			ImageUrl:    speaker.ImageUrl,
 		})
 	}
 
@@ -120,5 +124,6 @@ func ToEventResponseDTO(event *entities.Event) *EventResponseDTO {
 		ResponsibleUsers:  responsibleUsers,
 		Speakers:          speakers,
 		Lastname:          event.User.Lastname,
+		ImageUrl:          event.ImageUrl,
 	}
 }
