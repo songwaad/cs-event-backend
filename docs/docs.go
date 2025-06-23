@@ -406,6 +406,44 @@ const docTemplate = `{
                 }
             }
         },
+        "/calendar": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Retrieve all events and return them ordered by start date",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Calendar"
+                ],
+                "summary": "Get all calendar events",
+                "responses": {
+                    "200": {
+                        "description": "Successfully retrieved all calendar events",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/dto.CalendarResponseDTO"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            }
+        },
         "/event": {
             "post": {
                 "description": "Create a new event in the system",
@@ -795,44 +833,6 @@ const docTemplate = `{
                             "type": "array",
                             "items": {
                                 "$ref": "#/definitions/dto.EventResponseDTO"
-                            }
-                        }
-                    },
-                    "500": {
-                        "description": "Internal server error",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    }
-                }
-            }
-        },
-        "/events/calendar": {
-            "get": {
-                "security": [
-                    {
-                        "ApiKeyAuth": []
-                    }
-                ],
-                "description": "Retrieve all events and return them ordered by start date",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Calendar"
-                ],
-                "summary": "Get all calendar events",
-                "responses": {
-                    "200": {
-                        "description": "Successfully retrieved all calendar events",
-                        "schema": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "#/definitions/dto.CalendarResponseDTO"
                             }
                         }
                     },
@@ -1469,6 +1469,60 @@ const docTemplate = `{
                 }
             }
         },
+        "/user/change-password": {
+            "put": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Allows a user to change their password after verifying the old password.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "User"
+                ],
+                "summary": "Change user password",
+                "parameters": [
+                    {
+                        "description": "Old and new password",
+                        "name": "password",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.UserChangePasswordDTO"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Password successfully changed",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request due to invalid input",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            }
+        },
         "/user/{id}": {
             "get": {
                 "security": [
@@ -1541,67 +1595,6 @@ const docTemplate = `{
                 "responses": {
                     "204": {
                         "description": "User successfully deleted"
-                    },
-                    "500": {
-                        "description": "Internal server error",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    }
-                }
-            }
-        },
-        "/user/{id}/change-password": {
-            "put": {
-                "security": [
-                    {
-                        "ApiKeyAuth": []
-                    }
-                ],
-                "description": "Allows a user to change their password after verifying the old password.",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "User"
-                ],
-                "summary": "Change user password",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "User ID",
-                        "name": "id",
-                        "in": "path",
-                        "required": true
-                    },
-                    {
-                        "description": "Old and new password",
-                        "name": "password",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/dto.UserChangePasswordDTO"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "Password successfully changed",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    },
-                    "400": {
-                        "description": "Bad request due to invalid input",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
                     },
                     "500": {
                         "description": "Internal server error",
@@ -1799,6 +1792,9 @@ const docTemplate = `{
                 "eventType": {
                     "type": "string"
                 },
+                "event_id": {
+                    "type": "integer"
+                },
                 "location": {
                     "type": "string"
                 },
@@ -1914,6 +1910,9 @@ const docTemplate = `{
                 "has_budget": {
                     "type": "boolean"
                 },
+                "image_url": {
+                    "type": "string"
+                },
                 "lastname": {
                     "type": "string"
                 },
@@ -2028,6 +2027,9 @@ const docTemplate = `{
                 "firstname": {
                     "type": "string"
                 },
+                "imageUrl": {
+                    "type": "string"
+                },
                 "lastname": {
                     "type": "string"
                 },
@@ -2050,6 +2052,9 @@ const docTemplate = `{
         "dto.UserChangePasswordDTO": {
             "type": "object",
             "properties": {
+                "email": {
+                    "type": "string"
+                },
                 "new_password": {
                     "type": "string"
                 },
@@ -2071,6 +2076,9 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "first_name": {
+                    "type": "string"
+                },
+                "imageUrl": {
                     "type": "string"
                 },
                 "lastname": {
@@ -2097,10 +2105,16 @@ const docTemplate = `{
         "dto.UserResponseDTO": {
             "type": "object",
             "properties": {
+                "createdAt": {
+                    "type": "string"
+                },
                 "email": {
                     "type": "string"
                 },
                 "first_name": {
+                    "type": "string"
+                },
+                "imageUrl": {
                     "type": "string"
                 },
                 "last_name": {

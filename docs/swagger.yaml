@@ -15,6 +15,8 @@ definitions:
     properties:
       endDate:
         type: string
+      event_id:
+        type: integer
       eventType:
         type: string
       location:
@@ -94,6 +96,8 @@ definitions:
         type: string
       has_budget:
         type: boolean
+      image_url:
+        type: string
       lastname:
         type: string
       location:
@@ -169,6 +173,8 @@ definitions:
         type: string
       firstname:
         type: string
+      imageUrl:
+        type: string
       lastname:
         type: string
       speaker_id:
@@ -183,6 +189,8 @@ definitions:
     type: object
   dto.UserChangePasswordDTO:
     properties:
+      email:
+        type: string
       new_password:
         type: string
       old_password:
@@ -197,6 +205,8 @@ definitions:
       email:
         type: string
       first_name:
+        type: string
+      imageUrl:
         type: string
       lastname:
         type: string
@@ -214,9 +224,13 @@ definitions:
     type: object
   dto.UserResponseDTO:
     properties:
+      createdAt:
+        type: string
       email:
         type: string
       first_name:
+        type: string
+      imageUrl:
         type: string
       last_name:
         type: string
@@ -545,6 +559,30 @@ paths:
       summary: Update an existing Budget
       tags:
       - Budget
+  /calendar:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve all events and return them ordered by start date
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Successfully retrieved all calendar events
+          schema:
+            items:
+              $ref: '#/definitions/dto.CalendarResponseDTO'
+            type: array
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - ApiKeyAuth: []
+      summary: Get all calendar events
+      tags:
+      - Calendar
   /event:
     post:
       consumes:
@@ -814,30 +852,6 @@ paths:
       summary: Get all events
       tags:
       - Event
-  /events/calendar:
-    get:
-      consumes:
-      - application/json
-      description: Retrieve all events and return them ordered by start date
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: Successfully retrieved all calendar events
-          schema:
-            items:
-              $ref: '#/definitions/dto.CalendarResponseDTO'
-            type: array
-        "500":
-          description: Internal server error
-          schema:
-            additionalProperties: true
-            type: object
-      security:
-      - ApiKeyAuth: []
-      summary: Get all calendar events
-      tags:
-      - Calendar
   /events/plans:
     get:
       consumes:
@@ -1299,47 +1313,6 @@ paths:
       summary: Retrieve a user by ID
       tags:
       - User
-  /user/{id}/change-password:
-    put:
-      consumes:
-      - application/json
-      description: Allows a user to change their password after verifying the old
-        password.
-      parameters:
-      - description: User ID
-        in: path
-        name: id
-        required: true
-        type: string
-      - description: Old and new password
-        in: body
-        name: password
-        required: true
-        schema:
-          $ref: '#/definitions/dto.UserChangePasswordDTO'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: Password successfully changed
-          schema:
-            additionalProperties: true
-            type: object
-        "400":
-          description: Bad request due to invalid input
-          schema:
-            additionalProperties: true
-            type: object
-        "500":
-          description: Internal server error
-          schema:
-            additionalProperties: true
-            type: object
-      security:
-      - ApiKeyAuth: []
-      summary: Change user password
-      tags:
-      - User
   /user/{id}/role:
     put:
       consumes:
@@ -1417,6 +1390,42 @@ paths:
       security:
       - ApiKeyAuth: []
       summary: Update user status
+      tags:
+      - User
+  /user/change-password:
+    put:
+      consumes:
+      - application/json
+      description: Allows a user to change their password after verifying the old
+        password.
+      parameters:
+      - description: Old and new password
+        in: body
+        name: password
+        required: true
+        schema:
+          $ref: '#/definitions/dto.UserChangePasswordDTO'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Password successfully changed
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad request due to invalid input
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - ApiKeyAuth: []
+      summary: Change user password
       tags:
       - User
   /users:
