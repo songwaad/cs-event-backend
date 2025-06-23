@@ -13,7 +13,7 @@ type UserUseCase interface {
 	GetUserByID(userID string) (*entities.User, error)
 	GetAllUsers() ([]entities.User, error)
 	DeleteUser(userID string) error
-	ChangePassword(userID string, oldPassword string, newPassword string) error
+	ChangePassword(userEmail string, oldPassword string, newPassword string) error
 	UpdateUserRole(userID string, userRoleID uint) error
 	UpdateUserStatus(userID string, userStatusID uint) error
 }
@@ -86,8 +86,8 @@ func (s *UserService) DeleteUser(userID string) error {
 	return s.repo.DeleteUser(userID)
 }
 
-func (s *UserService) ChangePassword(userID string, oldPassword string, newPassword string) error {
-	user, err := s.repo.GetUserByID(userID)
+func (s *UserService) ChangePassword(userEmail string, oldPassword string, newPassword string) error {
+	user, err := s.repo.GetUserByEmail(userEmail)
 	if err != nil {
 		return errors.New("user not found")
 	}

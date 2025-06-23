@@ -51,6 +51,7 @@ func (h *UserHandler) Register(c *fiber.Ctx) error {
 		Lastname:     input.Lastname,
 		UserRoleID:   input.UserRoleID,
 		UserStatusID: 1,
+		ImageUrl:     input.ImageUrl,
 	}
 
 	if err := h.UserUseCase.Register(&user); err != nil {
@@ -191,15 +192,12 @@ func (h *UserHandler) GetAllUsers(c *fiber.Ctx) error {
 // @Accept json
 // @Produce json
 // @Security ApiKeyAuth
-// @Param id path string true "User ID"
 // @Param password body dto.UserChangePasswordDTO true "Old and new password"
 // @Success 200 {object} map[string]interface{} "Password successfully changed"
 // @Failure 400 {object} map[string]interface{} "Bad request due to invalid input"
 // @Failure 500 {object} map[string]interface{} "Internal server error"
-// @Router /user/{id}/change-password [put]
+// @Router /user/change-password [put]
 func (h *UserHandler) ChangePassword(c *fiber.Ctx) error {
-	userID := c.Params("id")
-
 	var input dto.UserChangePasswordDTO
 	if err := c.BodyParser(&input); err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
@@ -213,7 +211,7 @@ func (h *UserHandler) ChangePassword(c *fiber.Ctx) error {
 		})
 	}
 
-	if err := h.UserUseCase.ChangePassword(userID, input.OldPassword, input.NewPassword); err != nil {
+	if err := h.UserUseCase.ChangePassword(input.Email, input.OldPassword, input.NewPassword); err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
 			"message": err.Error(),
 		})
