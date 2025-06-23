@@ -140,6 +140,7 @@ func (h *HttpEventHandler) CreateEvent(c *fiber.Ctx) error {
 		EventStrategyID:   input.EventStrategyID,
 		CreatedByUserID:   input.CreatedByUserID,
 		EventStatusID:     input.EventStatusID,
+		ImageUrl:          input.ImageUrl,
 	}
 
 	// สร้าง event ใหม่
@@ -291,6 +292,7 @@ func (h *HttpEventHandler) UpdateEvent(c *fiber.Ctx) error {
 	existingEvent.EventTypeID = input.EventTypeID
 	existingEvent.EventStrategyID = input.EventStrategyID
 	existingEvent.EventStatusID = input.EventStatusID
+	existingEvent.ImageUrl = input.ImageUrl
 
 	// บันทึกการอัปเดต
 	if err := h.eventUseCase.UpdateEvent(existingEvent); err != nil {
@@ -352,7 +354,7 @@ func (h *HttpEventHandler) DeleteEvent(c *fiber.Ctx) error {
 // @Security ApiKeyAuth
 // @Success 200 {array} dto.CalendarResponseDTO "Successfully retrieved all calendar events"
 // @Failure 500 {object} map[string]interface{} "Internal server error"
-// @Router /events/calendar [get]
+// @Router /calendar [get]
 func (h *HttpEventHandler) GetCalendarEvents(c *fiber.Ctx) error {
 	events, err := h.eventUseCase.GetAllEvents()
 	if err != nil {

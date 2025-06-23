@@ -39,6 +39,7 @@ func (h *HttpSpeakerHandler) CreateSpeaker(c *fiber.Ctx) error {
 		FirstName:   input.FirstName,
 		Lastname:    input.Lastname,
 		Description: input.Description,
+		ImageUrl:    input.ImageUrl,
 	}
 
 	if err := h.speakerUseCase.CreateSpeaker(&speaker); err != nil {
@@ -154,6 +155,7 @@ func (h *HttpSpeakerHandler) UpdateSpeaker(c *fiber.Ctx) error {
 		FirstName:   input.FirstName,
 		Lastname:    input.Lastname,
 		Description: input.Description,
+		ImageUrl:    input.ImageUrl,
 	}
 
 	if err := h.speakerUseCase.UpdateSpeaker(&speaker); err != nil {
