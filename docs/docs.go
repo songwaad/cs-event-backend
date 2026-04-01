@@ -136,7 +136,8 @@ const docTemplate = `{
                     "201": {
                         "description": "User successfully created",
                         "schema": {
-                            "$ref": "#/definitions/dto.UserRegisterDTO"
+                            "type": "object",
+                            "additionalProperties": true
                         }
                     },
                     "400": {
@@ -305,48 +306,8 @@ const docTemplate = `{
                         }
                     }
                 }
-            }
-        },
-        "/budgets": {
-            "get": {
-                "security": [
-                    {
-                        "ApiKeyAuth": []
-                    }
-                ],
-                "description": "Retrieve a list of all Budgets",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Budget"
-                ],
-                "summary": "Get all Budgets",
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "#/definitions/dto.BudgetDTO"
-                            }
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    }
-                }
-            }
-        },
-        "/budgets/{id}": {
-            "put": {
+            },
+            "patch": {
                 "security": [
                     {
                         "ApiKeyAuth": []
@@ -406,6 +367,44 @@ const docTemplate = `{
                 }
             }
         },
+        "/budgets": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Retrieve a list of all Budgets",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Budget"
+                ],
+                "summary": "Get all Budgets",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/dto.BudgetDTO"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            }
+        },
         "/calendar": {
             "get": {
                 "security": [
@@ -446,6 +445,11 @@ const docTemplate = `{
         },
         "/event": {
             "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
                 "description": "Create a new event in the system",
                 "consumes": [
                     "application/json"
@@ -472,7 +476,8 @@ const docTemplate = `{
                     "201": {
                         "description": "Successfully created event",
                         "schema": {
-                            "$ref": "#/definitions/dto.EventResponseDTO"
+                            "type": "object",
+                            "additionalProperties": true
                         }
                     },
                     "400": {
@@ -590,6 +595,11 @@ const docTemplate = `{
         },
         "/event/{id}": {
             "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
                 "description": "Retrieve an event by its ID",
                 "consumes": [
                     "application/json"
@@ -617,6 +627,13 @@ const docTemplate = `{
                             "$ref": "#/definitions/dto.EventResponseDTO"
                         }
                     },
+                    "400": {
+                        "description": "Invalid event ID",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
                     "404": {
                         "description": "Event not found",
                         "schema": {
@@ -634,6 +651,11 @@ const docTemplate = `{
                 }
             },
             "put": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
                 "description": "Update an existing event in the system",
                 "consumes": [
                     "application/json"
@@ -694,6 +716,11 @@ const docTemplate = `{
                 }
             },
             "delete": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
                 "description": "Delete an event from the system",
                 "consumes": [
                     "application/json"
@@ -747,7 +774,7 @@ const docTemplate = `{
             }
         },
         "/event/{id}/status": {
-            "put": {
+            "patch": {
                 "security": [
                     {
                         "ApiKeyAuth": []
@@ -815,6 +842,11 @@ const docTemplate = `{
         },
         "/events": {
             "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
                 "description": "Retrieve all events from the system",
                 "consumes": [
                     "application/json"
@@ -848,6 +880,11 @@ const docTemplate = `{
         },
         "/events/plans": {
             "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
                 "description": "Retrieve all event plans from the system",
                 "consumes": [
                     "application/json"
@@ -865,7 +902,7 @@ const docTemplate = `{
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/entities.EventPlan"
+                                "$ref": "#/definitions/entity.EventPlan"
                             }
                         }
                     },
@@ -881,6 +918,11 @@ const docTemplate = `{
         },
         "/events/status": {
             "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
                 "description": "Retrieve all event status from the system",
                 "consumes": [
                     "application/json"
@@ -898,7 +940,7 @@ const docTemplate = `{
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/entities.EventStatus"
+                                "$ref": "#/definitions/entity.EventStatus"
                             }
                         }
                     },
@@ -914,6 +956,11 @@ const docTemplate = `{
         },
         "/events/types": {
             "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
                 "description": "Retrieve all event types from the system",
                 "consumes": [
                     "application/json"
@@ -931,7 +978,7 @@ const docTemplate = `{
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/entities.EventType"
+                                "$ref": "#/definitions/entity.EventType"
                             }
                         }
                     },
@@ -945,8 +992,13 @@ const docTemplate = `{
                 }
             }
         },
-        "/events/types/status": {
+        "/events/types-status": {
             "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
                 "description": "Retrieve all event type status from the system",
                 "consumes": [
                     "application/json"
@@ -964,12 +1016,54 @@ const docTemplate = `{
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/entities.EventTypeStatus"
+                                "$ref": "#/definitions/entity.EventTypeStatus"
                             }
                         }
                     },
                     "500": {
                         "description": "Internal server error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            }
+        },
+        "/me": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Returns the profile of the currently authenticated user based on JWT token",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "User"
+                ],
+                "summary": "Get current user",
+                "responses": {
+                    "200": {
+                        "description": "Current user details",
+                        "schema": {
+                            "$ref": "#/definitions/dto.UserResponseDTO"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "404": {
+                        "description": "User not found",
                         "schema": {
                             "type": "object",
                             "additionalProperties": true
@@ -1229,7 +1323,53 @@ const docTemplate = `{
                     }
                 }
             },
-            "put": {
+            "delete": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Delete a speaker by their unique speaker ID",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Speaker"
+                ],
+                "summary": "Delete a speaker",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Speaker ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "Speaker deleted successfully"
+                    },
+                    "400": {
+                        "description": "Invalid speaker ID",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            },
+            "patch": {
                 "security": [
                     {
                         "ApiKeyAuth": []
@@ -1274,52 +1414,6 @@ const docTemplate = `{
                     },
                     "400": {
                         "description": "Invalid input or speaker ID",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    },
-                    "500": {
-                        "description": "Internal server error",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    }
-                }
-            },
-            "delete": {
-                "security": [
-                    {
-                        "ApiKeyAuth": []
-                    }
-                ],
-                "description": "Delete a speaker by their unique speaker ID",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Speaker"
-                ],
-                "summary": "Delete a speaker",
-                "parameters": [
-                    {
-                        "type": "integer",
-                        "description": "Speaker ID",
-                        "name": "id",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "204": {
-                        "description": "Speaker deleted successfully"
-                    },
-                    "400": {
-                        "description": "Invalid speaker ID",
                         "schema": {
                             "type": "object",
                             "additionalProperties": true
@@ -1469,60 +1563,6 @@ const docTemplate = `{
                 }
             }
         },
-        "/user/change-password": {
-            "put": {
-                "security": [
-                    {
-                        "ApiKeyAuth": []
-                    }
-                ],
-                "description": "Allows a user to change their password after verifying the old password.",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "User"
-                ],
-                "summary": "Change user password",
-                "parameters": [
-                    {
-                        "description": "Old and new password",
-                        "name": "password",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/dto.UserChangePasswordDTO"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "Password successfully changed",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    },
-                    "400": {
-                        "description": "Bad request due to invalid input",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    },
-                    "500": {
-                        "description": "Internal server error",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    }
-                }
-            }
-        },
         "/user/{id}": {
             "get": {
                 "security": [
@@ -1606,8 +1646,69 @@ const docTemplate = `{
                 }
             }
         },
+        "/user/{id}/change-password": {
+            "patch": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Allows a user to change their password after verifying the old password.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "User"
+                ],
+                "summary": "Change user password",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "User ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Old and new password",
+                        "name": "password",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.UserChangePasswordDTO"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Password successfully changed",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request due to invalid input",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            }
+        },
         "/user/{id}/role": {
-            "put": {
+            "patch": {
                 "security": [
                     {
                         "ApiKeyAuth": []
@@ -1667,7 +1768,7 @@ const docTemplate = `{
             }
         },
         "/user/{id}/status": {
-            "put": {
+            "patch": {
                 "security": [
                     {
                         "ApiKeyAuth": []
@@ -2169,7 +2270,7 @@ const docTemplate = `{
                 }
             }
         },
-        "entities.EventPlan": {
+        "entity.EventPlan": {
             "type": "object",
             "properties": {
                 "event_plan_id": {
@@ -2183,7 +2284,7 @@ const docTemplate = `{
                 }
             }
         },
-        "entities.EventStatus": {
+        "entity.EventStatus": {
             "type": "object",
             "properties": {
                 "event_status_id": {
@@ -2194,7 +2295,7 @@ const docTemplate = `{
                 }
             }
         },
-        "entities.EventType": {
+        "entity.EventType": {
             "type": "object",
             "properties": {
                 "event_type_id": {
@@ -2205,7 +2306,7 @@ const docTemplate = `{
                 }
             }
         },
-        "entities.EventTypeStatus": {
+        "entity.EventTypeStatus": {
             "type": "object",
             "properties": {
                 "event_type_status_id": {

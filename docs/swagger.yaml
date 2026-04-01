@@ -265,7 +265,7 @@ definitions:
       user_status_id:
         type: integer
     type: object
-  entities.EventPlan:
+  entity.EventPlan:
     properties:
       event_plan_id:
         type: integer
@@ -274,21 +274,21 @@ definitions:
       work_plane:
         type: string
     type: object
-  entities.EventStatus:
+  entity.EventStatus:
     properties:
       event_status_id:
         type: integer
       status:
         type: string
     type: object
-  entities.EventType:
+  entity.EventType:
     properties:
       event_type_id:
         type: integer
       type:
         type: string
     type: object
-  entities.EventTypeStatus:
+  entity.EventTypeStatus:
     properties:
       event_type_status_id:
         type: integer
@@ -383,7 +383,8 @@ paths:
         "201":
           description: User successfully created
           schema:
-            $ref: '#/definitions/dto.UserRegisterDTO'
+            additionalProperties: true
+            type: object
         "400":
           description: Bad request due to invalid or missing input
           schema:
@@ -495,32 +496,7 @@ paths:
       summary: Get a Budget by ID
       tags:
       - Budget
-  /budgets:
-    get:
-      consumes:
-      - application/json
-      description: Retrieve a list of all Budgets
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            items:
-              $ref: '#/definitions/dto.BudgetDTO'
-            type: array
-        "500":
-          description: Internal Server Error
-          schema:
-            additionalProperties: true
-            type: object
-      security:
-      - ApiKeyAuth: []
-      summary: Get all Budgets
-      tags:
-      - Budget
-  /budgets/{id}:
-    put:
+    patch:
       consumes:
       - application/json
       description: Update an existing Budget by ID
@@ -557,6 +533,30 @@ paths:
       security:
       - ApiKeyAuth: []
       summary: Update an existing Budget
+      tags:
+      - Budget
+  /budgets:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve a list of all Budgets
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/dto.BudgetDTO'
+            type: array
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - ApiKeyAuth: []
+      summary: Get all Budgets
       tags:
       - Budget
   /calendar:
@@ -601,7 +601,8 @@ paths:
         "201":
           description: Successfully created event
           schema:
-            $ref: '#/definitions/dto.EventResponseDTO'
+            additionalProperties: true
+            type: object
         "400":
           description: Bad request
           schema:
@@ -612,6 +613,8 @@ paths:
           schema:
             additionalProperties: true
             type: object
+      security:
+      - ApiKeyAuth: []
       summary: Create a new event
       tags:
       - Event
@@ -711,6 +714,8 @@ paths:
           schema:
             additionalProperties: true
             type: object
+      security:
+      - ApiKeyAuth: []
       summary: Delete an event
       tags:
       - Event
@@ -731,6 +736,11 @@ paths:
           description: Successfully retrieved event
           schema:
             $ref: '#/definitions/dto.EventResponseDTO'
+        "400":
+          description: Invalid event ID
+          schema:
+            additionalProperties: true
+            type: object
         "404":
           description: Event not found
           schema:
@@ -741,6 +751,8 @@ paths:
           schema:
             additionalProperties: true
             type: object
+      security:
+      - ApiKeyAuth: []
       summary: Get event by ID
       tags:
       - Event
@@ -782,11 +794,13 @@ paths:
           schema:
             additionalProperties: true
             type: object
+      security:
+      - ApiKeyAuth: []
       summary: Update an event
       tags:
       - Event
   /event/{id}/status:
-    put:
+    patch:
       consumes:
       - application/json
       description: Update only the status of an existing event, if status is 4, notify
@@ -849,6 +863,8 @@ paths:
           schema:
             additionalProperties: true
             type: object
+      security:
+      - ApiKeyAuth: []
       summary: Get all events
       tags:
       - Event
@@ -864,13 +880,15 @@ paths:
           description: Successfully retrieved all event plans
           schema:
             items:
-              $ref: '#/definitions/entities.EventPlan'
+              $ref: '#/definitions/entity.EventPlan'
             type: array
         "500":
           description: Internal server error
           schema:
             additionalProperties: true
             type: object
+      security:
+      - ApiKeyAuth: []
       summary: Get all event plans
       tags:
       - Event
@@ -886,13 +904,15 @@ paths:
           description: Successfully retrieved all event status
           schema:
             items:
-              $ref: '#/definitions/entities.EventStatus'
+              $ref: '#/definitions/entity.EventStatus'
             type: array
         "500":
           description: Internal server error
           schema:
             additionalProperties: true
             type: object
+      security:
+      - ApiKeyAuth: []
       summary: Get all event status
       tags:
       - Event
@@ -908,17 +928,19 @@ paths:
           description: Successfully retrieved all event types
           schema:
             items:
-              $ref: '#/definitions/entities.EventType'
+              $ref: '#/definitions/entity.EventType'
             type: array
         "500":
           description: Internal server error
           schema:
             additionalProperties: true
             type: object
+      security:
+      - ApiKeyAuth: []
       summary: Get all event types
       tags:
       - Event
-  /events/types/status:
+  /events/types-status:
     get:
       consumes:
       - application/json
@@ -930,16 +952,46 @@ paths:
           description: Successfully retrieved all event type status
           schema:
             items:
-              $ref: '#/definitions/entities.EventTypeStatus'
+              $ref: '#/definitions/entity.EventTypeStatus'
             type: array
         "500":
           description: Internal server error
           schema:
             additionalProperties: true
             type: object
+      security:
+      - ApiKeyAuth: []
       summary: Get all event type status
       tags:
       - Event
+  /me:
+    get:
+      consumes:
+      - application/json
+      description: Returns the profile of the currently authenticated user based on
+        JWT token
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Current user details
+          schema:
+            $ref: '#/definitions/dto.UserResponseDTO'
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: User not found
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - ApiKeyAuth: []
+      summary: Get current user
+      tags:
+      - User
   /notification/{id}:
     delete:
       consumes:
@@ -1134,7 +1186,7 @@ paths:
       summary: Get a Speaker by ID
       tags:
       - Speaker
-    put:
+    patch:
       consumes:
       - application/json
       description: Update a speaker's details (first name, last name, description)
@@ -1313,8 +1365,49 @@ paths:
       summary: Retrieve a user by ID
       tags:
       - User
+  /user/{id}/change-password:
+    patch:
+      consumes:
+      - application/json
+      description: Allows a user to change their password after verifying the old
+        password.
+      parameters:
+      - description: User ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Old and new password
+        in: body
+        name: password
+        required: true
+        schema:
+          $ref: '#/definitions/dto.UserChangePasswordDTO'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Password successfully changed
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad request due to invalid input
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - ApiKeyAuth: []
+      summary: Change user password
+      tags:
+      - User
   /user/{id}/role:
-    put:
+    patch:
       consumes:
       - application/json
       description: Updates the role of a user by their unique ID.
@@ -1353,7 +1446,7 @@ paths:
       tags:
       - User
   /user/{id}/status:
-    put:
+    patch:
       consumes:
       - application/json
       description: Changes the user status (e.g., active, inactive) based on their
@@ -1390,42 +1483,6 @@ paths:
       security:
       - ApiKeyAuth: []
       summary: Update user status
-      tags:
-      - User
-  /user/change-password:
-    put:
-      consumes:
-      - application/json
-      description: Allows a user to change their password after verifying the old
-        password.
-      parameters:
-      - description: Old and new password
-        in: body
-        name: password
-        required: true
-        schema:
-          $ref: '#/definitions/dto.UserChangePasswordDTO'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: Password successfully changed
-          schema:
-            additionalProperties: true
-            type: object
-        "400":
-          description: Bad request due to invalid input
-          schema:
-            additionalProperties: true
-            type: object
-        "500":
-          description: Internal server error
-          schema:
-            additionalProperties: true
-            type: object
-      security:
-      - ApiKeyAuth: []
-      summary: Change user password
       tags:
       - User
   /users:
