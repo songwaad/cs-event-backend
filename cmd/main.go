@@ -17,7 +17,7 @@ import (
 // @title ComSci Event API
 // @description This is a sample server for a ComSci Event API.
 // @version 1.0
-// @host localhost:8080
+// @host localhost:3000
 // @BasePath /
 // @schemes http
 // @securityDefinitions.apikey ApiKeyAuth
